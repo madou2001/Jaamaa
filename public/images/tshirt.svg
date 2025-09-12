@@ -1,0 +1,6 @@
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="#f8fafc"/>
+  <path d="M140 120 L160 100 L240 100 L260 120 L280 120 L280 140 L260 140 L260 250 L140 250 L140 140 L120 140 L120 120 Z" fill="#3b82f6" stroke="#2563eb" stroke-width="2"/>
+  <path d="M160 100 L170 80 L230 80 L240 100" fill="none" stroke="#2563eb" stroke-width="2"/>
+  <text x="200" y="280" font-family="Arial, sans-serif" font-size="12" fill="#64748b" text-anchor="middle">T-shirt Premium</text>
+</svg>
