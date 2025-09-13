@@ -39,7 +39,7 @@ const ModernHero: React.FC<HeroProps> = ({ stats }) => {
       setCurrentText((prev) => (prev + 1) % heroTexts.length)
     }, 3000)
     return () => clearInterval(interval)
-  }, [])
+  }, [heroTexts.length])
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -50,7 +50,7 @@ const ModernHero: React.FC<HeroProps> = ({ stats }) => {
         staggerChildren: 0.2
       }
     }
-  }
+  } as const
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
@@ -62,7 +62,7 @@ const ModernHero: React.FC<HeroProps> = ({ stats }) => {
         ease: "easeOut"
       }
     }
-  }
+  } as const
 
   const floatingElements = Array.from({ length: 20 }, (_, i) => ({
     id: i,
@@ -85,8 +85,14 @@ const ModernHero: React.FC<HeroProps> = ({ stats }) => {
       <div className="absolute inset-0 overflow-hidden">
         {/* Gradient Orbs */}
         <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
-        <div className="absolute top-3/4 right-1/4 w-96 h-96 bg-gradient-to-r from-pink-400 to-red-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" style={{ animationDelay: '4s' }}></div>
+        <div 
+          className="absolute top-3/4 right-1/4 w-96 h-96 bg-gradient-to-r from-pink-400 to-red-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse" 
+          style={{ animationDelay: '2s' } as React.CSSProperties}
+        ></div>
+        <div 
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" 
+          style={{ animationDelay: '4s' } as React.CSSProperties}
+        ></div>
 
         {/* Floating Particles */}
         {floatingElements.map((element) => (

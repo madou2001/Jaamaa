@@ -43,6 +43,8 @@ const mockProduct = {
   images: [],
   seo_title: null,
   seo_description: null,
+  meta_title: null,
+  meta_description: null,
   tags: [],
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString()

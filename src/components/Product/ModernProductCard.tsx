@@ -68,10 +68,10 @@ const ModernProductCard: React.FC<ModernProductCardProps> = ({
       transition: {
         duration: 0.5,
         delay: index * 0.1,
-        ease: "easeOut"
+        ease: "easeOut" as const
       }
     }
-  }
+  } as const
 
   const hoverVariants = {
     rest: { scale: 1, y: 0 },
@@ -80,10 +80,10 @@ const ModernProductCard: React.FC<ModernProductCardProps> = ({
       y: -8,
       transition: {
         duration: 0.3,
-        ease: "easeOut"
+        ease: "easeOut" as const
       }
     }
-  }
+  } as const
 
   return (
     <motion.div
