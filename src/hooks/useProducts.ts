@@ -138,7 +138,7 @@ export const useProducts = (filters?: ProductFilters) => {
     try {
       const { data, error } = await supabase
         .from('products')
-        .insert(product)
+        .insert(product as any)
         .select()
         .single()
 
@@ -153,6 +153,7 @@ export const useProducts = (filters?: ProductFilters) => {
     try {
       const { data, error } = await supabase
         .from('products')
+        // @ts-ignore
         .update(updates)
         .eq('id', id)
         .select()

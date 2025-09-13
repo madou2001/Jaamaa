@@ -9,17 +9,8 @@ expect.extend(matchers)
 declare global {
   namespace Vi {
     interface JestAssertion<T = any>
-      extends jest.Matchers<void, T>,
-        TestingLibraryMatchers<T, void> {}
+      extends jest.Matchers<void, T> {}
   }
-}
-
-interface TestingLibraryMatchers<R = unknown, T = {}> {
-  toBeInTheDocument(): R
-  toHaveTextContent(text: string | RegExp): R
-  toBeVisible(): R
-  toBeDisabled(): R
-  toBeEnabled(): R
 }
 
 // Cleanup after each test

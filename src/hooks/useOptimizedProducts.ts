@@ -164,7 +164,7 @@ export const useOptimizedProducts = (filters: ProductFilters = {}) => {
 
   // Fonction de recherche avec debounce
   const debouncedSearch = useCallback(
-    debounce(async (searchFilters: ProductFilters) => {
+    debounce(async (_searchFilters: ProductFilters) => {
       try {
         setLoading(true)
         setError(null)

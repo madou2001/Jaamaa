@@ -151,7 +151,7 @@ export const usePromotions = () => {
     )
   }
 
-  const validatePromoCode = async (code: string, cartItems: any[], cartTotal: number): Promise<PromoCode> => {
+  const validatePromoCode = async (code: string, _cartItems: any[], cartTotal: number): Promise<PromoCode> => {
     setLoading(true)
 
     try {
@@ -194,7 +194,7 @@ export const usePromotions = () => {
           id: promotion.id,
           code: upperCode,
           discount: 0,
-          type: promotion.type,
+          type: promotion.type === 'shipping' || promotion.type === 'bogo' ? 'fixed' : promotion.type,
           description: promotion.description,
           isValid: false,
           message: `Montant minimum de ${promotion.minAmount}€ requis`
@@ -225,7 +225,7 @@ export const usePromotions = () => {
         id: promotion.id,
         code: upperCode,
         discount: Math.round(discount * 100) / 100,
-        type: promotion.type,
+        type: promotion.type === 'shipping' || promotion.type === 'bogo' ? 'fixed' : promotion.type,
         description: promotion.description,
         isValid: true,
         message: promotion.type === 'shipping' 
@@ -304,7 +304,7 @@ export const usePromotions = () => {
     })
   }
 
-  const getBestPromotionForCart = (cartItems: any[], cartTotal: number) => {
+  const getBestPromotionForCart = (_cartItems: any[], cartTotal: number) => {
     let bestPromo = null
     let maxDiscount = 0
 

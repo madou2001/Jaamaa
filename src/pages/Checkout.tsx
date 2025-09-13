@@ -364,7 +364,7 @@ const Checkout: React.FC = () => {
       // Sauvegarder la commande dans Supabase
       if (user) {
         // Sauvegarder la commande principale
-        const { data: orderData, error: orderError } = await supabase
+        const { error: orderError } = await supabase
           .from('orders')
           .insert({
             id: orderId,
@@ -418,7 +418,7 @@ const Checkout: React.FC = () => {
           total_price: item.productPrice * item.quantity
         }))
 
-        const { data: itemsData, error: itemsError } = await supabase
+        const { error: itemsError } = await supabase
           .from('order_items')
           .insert(orderItems as any)
           .select()

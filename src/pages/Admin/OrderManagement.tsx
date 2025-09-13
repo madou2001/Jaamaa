@@ -68,6 +68,7 @@ const OrderManagement: React.FC = () => {
     try {
       const { error: updateError } = await supabase
         .from('orders')
+        // @ts-ignore
         .update({ status: newStatus })
         .eq('id', orderId)
 

@@ -4,7 +4,6 @@ import {
   CurrencyEuroIcon,
   ShoppingBagIcon,
   UsersIcon,
-  CalendarIcon,
   FunnelIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon
@@ -88,7 +87,7 @@ const Analytics: React.FC = () => {
       const products = productsResult.data || []
 
       // Calculs statistiques
-      const totalRevenue = orders.reduce((sum, order) => sum + order.total_amount, 0)
+      const totalRevenue = (orders as any[]).reduce((sum, order) => sum + order.total_amount, 0)
       const totalOrders = orders.length
       const totalCustomers = customers.length
       const totalProducts = products.length
@@ -115,7 +114,7 @@ const Analytics: React.FC = () => {
       const topProducts = products
         .slice(0, 5)
         .map(product => ({
-          name: product.name,
+          name: (product as any).name,
           sales: Math.floor(Math.random() * 100) + 10,
           revenue: Math.random() * 10000 + 2000
         }))

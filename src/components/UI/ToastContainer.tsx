@@ -12,8 +12,8 @@ const ToastContainer: React.FC = () => {
         {toasts.map((toast) => (
           <Toast
             key={toast.id}
-            {...toast}
-            onClose={() => removeToast(toast.id)}
+            toasts={[toast]}
+            onRemove={() => removeToast(toast.id)}
           />
         ))}
       </AnimatePresence>

@@ -153,7 +153,7 @@ export const useCleanup = (cleanupFn: () => void) => {
 }
 
 // Mesure des performances
-export const measurePerformance = (name: string) => {
+export const measurePerformance = (_name: string) => {
   const start = performance.now()
 
   return {

@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { 
-  AdjustmentsHorizontalIcon,
   XMarkIcon,
   FunnelIcon,
   Squares2X2Icon,
   ListBulletIcon,
   StarIcon
 } from '@heroicons/react/24/outline'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useAdvancedSearch } from '../hooks/useAdvancedSearch'
 import { useLocalCart } from '../hooks/useLocalCart'
 import { useWishlist } from '../hooks/useWishlist'

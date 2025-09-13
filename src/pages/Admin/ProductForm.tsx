@@ -100,7 +100,7 @@ const ProductForm: React.FC = () => {
   }
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<ProductFormData> = {}
+    const newErrors: Record<string, string> = {}
 
     if (!formData.name.trim()) {
       newErrors.name = 'Le nom est requis'

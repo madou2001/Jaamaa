@@ -65,8 +65,9 @@ export const useCart = () => {
         // Update quantity
         const { data, error } = await supabase
           .from('cart_items')
-          .update({ quantity: existingItem.quantity + quantity })
-          .eq('id', existingItem.id)
+          // @ts-ignore
+          .update({ quantity: (existingItem as any).quantity + quantity })
+          .eq('id', (existingItem as any).id)
           .select(`
             *,
             products (*)
@@ -76,7 +77,7 @@ export const useCart = () => {
         if (error) throw error
         setCartItems(prev => 
           prev.map(item => 
-            item.id === existingItem.id ? data : item
+            item.id === (existingItem as any).id ? data : item
           )
         )
       } else {
@@ -87,7 +88,7 @@ export const useCart = () => {
             user_id: user.id,
             product_id: productId,
             quantity,
-          })
+          } as any)
           .select(`
             *,
             products (*)
@@ -113,6 +114,7 @@ export const useCart = () => {
 
       const { data, error } = await supabase
         .from('cart_items')
+        // @ts-ignore
         .update({ quantity })
         .eq('id', cartItemId)
         .eq('user_id', user.id)

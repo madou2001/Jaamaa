@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
 interface SearchFilters {
@@ -73,7 +73,7 @@ export const useAdvancedSearch = () => {
         .limit(3)
 
       if (products) {
-        products.forEach(product => {
+        (products as any[]).forEach(product => {
           suggestions.push({
             type: 'product',
             value: product.id,
@@ -91,7 +91,7 @@ export const useAdvancedSearch = () => {
         .limit(2)
 
       if (categories) {
-        categories.forEach(category => {
+        (categories as any[]).forEach(category => {
           suggestions.push({
             type: 'category',
             value: category.id,
@@ -235,7 +235,7 @@ export const useAdvancedSearch = () => {
   const calculateFacets = async (products: any[]) => {
     // Calculer les facettes à partir des résultats
     const categories = new Map()
-    const brands = new Map()
+    // const brands = new Map()
     const priceRanges = [
       { min: 0, max: 50, count: 0 },
       { min: 50, max: 100, count: 0 },

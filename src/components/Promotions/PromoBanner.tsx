@@ -21,7 +21,7 @@ const PromoBanner: React.FC<PromoBannerProps> = ({
   className = '',
   maxItems = 3
 }) => {
-  const { getHotDeals, getFlashSales, activePromotions } = usePromotions()
+  const { getHotDeals, getFlashSales } = usePromotions()
   const [dismissed, setDismissed] = useState<string[]>([])
   const [currentPromoIndex, setCurrentPromoIndex] = useState(0)
 

@@ -2,7 +2,6 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useBrands } from '../hooks/useBrands'
-import LoadingSpinner from '../components/UI/LoadingSpinner'
 
 const Brands: React.FC = () => {
   const { brands, loading } = useBrands()

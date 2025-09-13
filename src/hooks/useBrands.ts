@@ -83,7 +83,7 @@ export const useBrands = () => {
     try {
       const { data, error } = await supabase
         .from('brands')
-        .insert(brand)
+        .insert(brand as any)
         .select()
         .single()
 
@@ -98,6 +98,7 @@ export const useBrands = () => {
     try {
       const { data, error } = await supabase
         .from('brands')
+        // @ts-ignore
         .update(updates)
         .eq('id', id)
         .select()

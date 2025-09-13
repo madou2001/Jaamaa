@@ -44,7 +44,7 @@ interface Address {
 
 const Profile: React.FC = () => {
   const { user, signOut } = useAuth()
-  const { getCartItemsCount } = useLocalCart()
+  const { } = useLocalCart()
   const { getWishlistCount } = useWishlist()
   const { toasts, removeToast, success, error } = useToast()
 
@@ -309,7 +309,7 @@ const Profile: React.FC = () => {
       // })
 
       // Vérifier si le profil existe déjà
-      const { data: existingProfile, error: checkError } = await supabase
+      const { error: _checkError } = await supabase
         .from('profiles')
         .select('id')
         .eq('id', user.id)
@@ -419,7 +419,8 @@ const Profile: React.FC = () => {
       if (addressData.isDefault) {
         const { error: updateError } = await (supabase
           .from('addresses')
-          .update({ is_default: false } as any)
+          // @ts-ignore
+          .update({ is_default: false })
           .eq('user_id', user.id)
           .neq('id', editingAddress?.id || '') as any)
         
@@ -447,7 +448,8 @@ const Profile: React.FC = () => {
         // Mettre à jour l'adresse existante
         const { data, error } = await (supabase
           .from('addresses')
-          .update(addressPayload as any)
+          // @ts-ignore
+          .update(addressPayload)
           .eq('id', editingAddress.id)
           .eq('user_id', user.id)
           .select() as any)

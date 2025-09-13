@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { getProxyImageUrl, handleImageError, optimizeImageUrl } from '../../utils/imageUtils'
+import { getProxyImageUrl, optimizeImageUrl } from '../../utils/imageUtils'
 
 interface OptimizedImageProps {
   src: string

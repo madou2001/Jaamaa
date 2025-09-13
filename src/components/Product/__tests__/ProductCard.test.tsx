@@ -62,7 +62,7 @@ describe('ProductCard', () => {
         <ProductCard product={mockProduct} />
       </TestWrapper>
     )
-    expect(screen.getByText('Test Product')).toBeInTheDocument()
+    expect(screen.getByText('Test Product')).toBeTruthy()
   })
 
   it('displays product name and price', () => {
@@ -71,8 +71,8 @@ describe('ProductCard', () => {
         <ProductCard product={mockProduct} />
       </TestWrapper>
     )
-    expect(screen.getByText('Test Product')).toBeInTheDocument()
-    expect(screen.getByText('99,99 €')).toBeInTheDocument() // French currency format
+    expect(screen.getByText('Test Product')).toBeTruthy()
+    expect(screen.getByText('99,99 €')).toBeTruthy() // French currency format
   })
 
   it('shows stock information when track_quantity is enabled', () => {
@@ -81,6 +81,6 @@ describe('ProductCard', () => {
         <ProductCard product={mockProduct} />
       </TestWrapper>
     )
-    expect(screen.getByText('En stock (10 disponibles)')).toBeInTheDocument()
+    expect(screen.getByText('En stock (10 disponibles)')).toBeTruthy()
   })
 })
