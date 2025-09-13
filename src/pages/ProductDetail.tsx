@@ -130,7 +130,6 @@ const ProductDetail: React.FC = () => {
       setAverageRating(avgRating)
 
     } catch (err) {
-      console.error('Error fetching product:', err)
       error('Erreur', 'Impossible de charger le produit')
       navigate('/products')
     } finally {
@@ -258,10 +257,6 @@ const ProductDetail: React.FC = () => {
   const currentPrice = selectedVariant?.price || product.price
   const originalPrice = product.compare_price
 
-  // Debug: afficher les données du produit côté client
-  console.log('🛍️ ProductDetail - Product data:', product)
-  console.log('🖼️ ProductDetail - Images array:', images)
-  console.log('🖼️ ProductDetail - Main image URL:', product.image_url)
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -292,8 +287,6 @@ const ProductDetail: React.FC = () => {
               alt={product.name}
               className="w-full h-full object-cover rounded-lg"
               fallbackSrc="/placeholder-product.svg"
-              onLoad={() => console.log('✅ Image principale chargée:', images[selectedImage])}
-              onError={() => console.warn('❌ Erreur image principale:', images[selectedImage])}
             />
             
             {/* Image Navigation */}
@@ -697,3 +690,4 @@ const ProductDetail: React.FC = () => {
 }
 
 export default ProductDetail
+

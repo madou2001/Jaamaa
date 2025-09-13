@@ -40,7 +40,7 @@ const OrderConfirmation: React.FC = () => {
         .single()
 
       if (orderError) {
-        console.error('Erreur lors du chargement de la commande:', orderError)
+        // console.error('Erreur lors du chargement de la commande:', orderError)
         
         // Fallback vers localStorage pour les anciennes commandes
         const localOrderData = localStorage.getItem(`order_${orderId}`)
@@ -90,7 +90,7 @@ const OrderConfirmation: React.FC = () => {
         setOrder(transformedOrder)
       }
     } catch (error) {
-      console.error('Erreur lors du chargement de la commande:', error)
+      // console.error('Erreur lors du chargement de la commande:', error)
     } finally {
       setLoading(false)
     }

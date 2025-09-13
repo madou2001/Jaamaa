@@ -151,7 +151,7 @@ const Checkout: React.FC = () => {
           ...baseInfo
         }))
       } catch (err) {
-        console.error('Erreur lors du chargement du profil:', err)
+        // console.error('Erreur lors du chargement du profil:', err)
       } finally {
         setLoadingProfile(false)
       }
@@ -206,7 +206,7 @@ const Checkout: React.FC = () => {
           } as any)
 
         if (profileError) {
-          console.error('Erreur lors de la mise à jour du profil:', profileError)
+          // console.error('Erreur lors de la mise à jour du profil:', profileError)
         }
 
         // Sauvegarder l'adresse comme adresse par défaut
@@ -227,12 +227,12 @@ const Checkout: React.FC = () => {
           } as any)
 
         if (addressError) {
-          console.error('Erreur lors de la sauvegarde de l\'adresse:', addressError)
+          // console.error('Erreur lors de la sauvegarde de l\'adresse:', addressError)
         } else {
           success('Profil mis à jour', 'Vos informations ont été sauvegardées dans votre profil')
         }
       } catch (err) {
-        console.error('Erreur lors de la sauvegarde:', err)
+        // console.error('Erreur lors de la sauvegarde:', err)
       }
     }
 
@@ -307,7 +307,7 @@ const Checkout: React.FC = () => {
         } as any)
 
       if (orderError) {
-        console.error('Erreur lors de la création de la commande:', orderError)
+        // console.error('Erreur lors de la création de la commande:', orderError)
         throw new Error('Erreur lors de la création de la commande')
       }
 
@@ -326,7 +326,7 @@ const Checkout: React.FC = () => {
         .insert(orderItems as any)
 
       if (itemsError) {
-        console.error('Erreur lors de la sauvegarde des articles:', itemsError)
+        // console.error('Erreur lors de la sauvegarde des articles:', itemsError)
         // Continuer malgré l'erreur des articles
       }
 
@@ -356,10 +356,10 @@ const Checkout: React.FC = () => {
       const orderId = crypto.randomUUID()
       const orderNumber = `ORD-${Date.now()}`
 
-      console.log('💰 Finalisation de la commande avec paiement à la livraison')
-      console.log('🆔 ID commande:', orderId)
-      console.log('📦 Articles:', cartItems)
-      console.log('🚚 Informations de livraison:', shippingInfo)
+      // console.log('💰 Finalisation de la commande avec paiement à la livraison')
+      // console.log('🆔 ID commande:', orderId)
+      // console.log('📦 Articles:', cartItems)
+      // console.log('🚚 Informations de livraison:', shippingInfo)
 
       // Sauvegarder la commande dans Supabase
       if (user) {
@@ -402,11 +402,11 @@ const Checkout: React.FC = () => {
           .select()
 
         if (orderError) {
-          console.error('❌ Erreur lors de la sauvegarde de la commande:', orderError)
+          // console.error('❌ Erreur lors de la sauvegarde de la commande:', orderError)
           throw new Error('Erreur lors de la sauvegarde de la commande')
         }
 
-        console.log('✅ Commande principale sauvegardée:', orderData)
+        // console.log('✅ Commande principale sauvegardée:', orderData)
 
         // Sauvegarder les articles de la commande
         const orderItems = cartItems.map(item => ({
@@ -424,11 +424,11 @@ const Checkout: React.FC = () => {
           .select()
 
         if (itemsError) {
-          console.error('❌ Erreur lors de la sauvegarde des articles:', itemsError)
+          // console.error('❌ Erreur lors de la sauvegarde des articles:', itemsError)
           throw new Error('Erreur lors de la sauvegarde des articles')
         }
 
-        console.log('✅ Articles de commande sauvegardés:', itemsData)
+        // console.log('✅ Articles de commande sauvegardés:', itemsData)
 
         // Demander si l'utilisateur veut sauvegarder les informations de livraison
         if (window.confirm('Voulez-vous sauvegarder ces informations de livraison pour vos prochaines commandes ?')) {
@@ -461,9 +461,9 @@ const Checkout: React.FC = () => {
                 updated_at: new Date().toISOString()
               } as any)
 
-            console.log('✅ Informations utilisateur sauvegardées')
+            // console.log('✅ Informations utilisateur sauvegardées')
           } catch (err) {
-            console.warn('⚠️ Erreur lors de la sauvegarde des informations utilisateur:', err)
+            // console.warn('⚠️ Erreur lors de la sauvegarde des informations utilisateur:', err)
           }
         }
       }
@@ -476,7 +476,7 @@ const Checkout: React.FC = () => {
       // Rediriger vers la page de confirmation
       navigate(`/order-confirmation/${orderId}`)
     } catch (err) {
-      console.error('❌ Erreur lors de la finalisation:', err)
+      // console.error('❌ Erreur lors de la finalisation:', err)
       error('Erreur', 'Une erreur est survenue lors du traitement de votre commande')
     } finally {
       setLoading(false)

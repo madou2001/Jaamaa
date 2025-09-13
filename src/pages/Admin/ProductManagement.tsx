@@ -52,7 +52,6 @@ const ProductManagement: React.FC = () => {
       if (fetchError) throw fetchError
       setProducts(data || [])
     } catch (err) {
-      console.error('Erreur lors du chargement des produits:', err)
       error('Erreur', 'Impossible de charger les produits')
     } finally {
       setLoading(false)
@@ -78,7 +77,6 @@ const ProductManagement: React.FC = () => {
 
       success('Statut mis à jour', `Produit ${newStatus === 'active' ? 'activé' : 'désactivé'}`)
     } catch (err) {
-      console.error('Erreur lors de la mise à jour du statut:', err)
       error('Erreur', 'Impossible de mettre à jour le statut')
     }
   }
@@ -98,7 +96,6 @@ const ProductManagement: React.FC = () => {
 
       success('Produit mis à jour', featured ? 'Ajouté aux vedettes' : 'Retiré des vedettes')
     } catch (err) {
-      console.error('Erreur lors de la mise à jour:', err)
       error('Erreur', 'Impossible de mettre à jour le produit')
     }
   }
@@ -119,7 +116,6 @@ const ProductManagement: React.FC = () => {
       setProducts(prev => prev.filter(product => product.id !== productId))
       success('Produit supprimé', 'Le produit a été supprimé avec succès')
     } catch (err) {
-      console.error('Erreur lors de la suppression:', err)
       error('Erreur', 'Impossible de supprimer le produit')
     }
   }

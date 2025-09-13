@@ -97,7 +97,7 @@ const Settings: React.FC = () => {
       // Pour l'instant, on utilise les valeurs par défaut
       await new Promise(resolve => setTimeout(resolve, 500)) // Simulation
     } catch (err) {
-      console.error('Erreur lors du chargement des paramètres:', err)
+      // console.error('Erreur lors du chargement des paramètres:', err)
       error('Erreur', 'Impossible de charger les paramètres')
     } finally {
       setLoading(false)
@@ -111,7 +111,7 @@ const Settings: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 1000)) // Simulation
       success('Paramètres sauvegardés', 'Les modifications ont été enregistrées avec succès')
     } catch (err) {
-      console.error('Erreur lors de la sauvegarde:', err)
+      // console.error('Erreur lors de la sauvegarde:', err)
       error('Erreur', 'Impossible de sauvegarder les paramètres')
     } finally {
       setLoading(false)

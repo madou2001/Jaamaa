@@ -34,7 +34,7 @@ export const useCategories = () => {
 
       setCategories(data || [])
     } catch (err) {
-      console.error('Erreur lors du chargement des catégories:', err)
+      // console.error('Erreur lors du chargement des catégories:', err)
       setError('Impossible de charger les catégories')
       
       // Fournir des catégories par défaut en cas d'erreur

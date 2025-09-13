@@ -95,7 +95,7 @@ const Dashboard: React.FC = () => {
       setRecentOrders(recentOrdersData)
 
     } catch (error) {
-      console.error('Erreur lors du chargement des données:', error)
+      // console.error('Erreur lors du chargement des données:', error)
     } finally {
       setLoading(false)
     }

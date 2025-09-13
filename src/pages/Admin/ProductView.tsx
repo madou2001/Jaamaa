@@ -8,37 +8,18 @@ import {
   TagIcon,
   CubeIcon,
   CurrencyEuroIcon,
-  PhotoIcon,
-  ClipboardDocumentListIcon
+  PhotoIcon
 } from '@heroicons/react/24/outline'
-import { supabase } from '../../lib/supabase'
+import { supabase, type Database } from '../../lib/supabase'
 import { useToast } from '../../hooks/useToast'
 import Toast from '../../components/UI/Toast'
 import OptimizedImage from '../../components/UI/OptimizedImage'
 import { testImageLoad } from '../../utils/testImages'
 
-interface Product {
-  id: string
-  name: string
-  description: string
-  price: number
-  sku?: string
-  quantity: number
-  image_url?: string
-  status: 'active' | 'inactive' | 'draft'
-  featured: boolean
-  created_at: string
-  updated_at: string
-  category_id?: string
-  brand?: string
-  tags?: string[]
-  specifications?: { [key: string]: string }
-}
-
-interface Category {
-  id: string
-  name: string
-}
+// Use the proper types from the database schema
+type Product = Database['public']['Tables']['products']['Row']
+type Category = Database['public']['Tables']['categories']['Row']
+type Brand = Database['public']['Tables']['brands']['Row']
 
 const ProductView: React.FC = () => {
   const navigate = useNavigate()
@@ -47,6 +28,7 @@ const ProductView: React.FC = () => {
 
   const [product, setProduct] = useState<Product | null>(null)
   const [category, setCategory] = useState<Category | null>(null)
+  const [brand, setBrand] = useState<Brand | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -64,14 +46,15 @@ const ProductView: React.FC = () => {
         .from('products')
         .select('*')
         .eq('id', productId)
-        .single()
+        .single() as { data: Product | null, error: any }
 
       if (productError) throw productError
+      if (!productData) throw new Error('Produit non trouvé')
 
       setProduct(productData)
 
       // Récupérer la catégorie si elle existe
-      if (productData.category_id) {
+      if (productData?.category_id) {
         const { data: categoryData, error: categoryError } = await supabase
           .from('categories')
           .select('id, name')
@@ -82,8 +65,20 @@ const ProductView: React.FC = () => {
           setCategory(categoryData)
         }
       }
+
+      // Récupérer la marque si elle existe
+      if (productData?.brand_id) {
+        const { data: brandData, error: brandError } = await supabase
+          .from('brands')
+          .select('id, name')
+          .eq('id', productData.brand_id)
+          .single()
+
+        if (!brandError && brandData) {
+          setBrand(brandData)
+        }
+      }
     } catch (err) {
-      console.error('Erreur lors du chargement du produit:', err)
       error('Erreur', 'Impossible de charger le produit')
       navigate('/admin/products')
     } finally {
@@ -107,7 +102,6 @@ const ProductView: React.FC = () => {
       success('Produit supprimé', 'Le produit a été supprimé avec succès')
       navigate('/admin/products')
     } catch (err) {
-      console.error('Erreur lors de la suppression:', err)
       error('Erreur', 'Impossible de supprimer le produit')
     }
   }
@@ -117,7 +111,7 @@ const ProductView: React.FC = () => {
 
     try {
       const newFeatured = !product.featured
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('products')
         .update({ featured: newFeatured })
         .eq('id', product.id)
@@ -127,7 +121,6 @@ const ProductView: React.FC = () => {
       setProduct(prev => prev ? { ...prev, featured: newFeatured } : null)
       success('Produit mis à jour', newFeatured ? 'Ajouté aux vedettes' : 'Retiré des vedettes')
     } catch (err) {
-      console.error('Erreur lors de la mise à jour:', err)
       error('Erreur', 'Impossible de mettre à jour le produit')
     }
   }
@@ -205,15 +198,10 @@ const ProductView: React.FC = () => {
     )
   }
 
-  // Debug: afficher l'URL de l'image dans la console
-  console.log('🖼️ Product image URL:', product.image_url)
-  console.log('🗂️ Product data:', product)
   
   // Test automatique de l'image
   if (product.image_url) {
-    testImageLoad(product.image_url).then(success => {
-      console.log(`🧪 Test image ${product.image_url}:`, success ? '✅ OK' : '❌ FAIL')
-    })
+    testImageLoad(product.image_url).then(() => {})
   }
 
   return (
@@ -280,8 +268,6 @@ const ProductView: React.FC = () => {
                   alt={product.name}
                   className="w-full h-full object-cover rounded-lg"
                   fallbackSrc="/placeholder-product.svg"
-                  onLoad={() => console.log('✅ Image produit chargée:', product.image_url)}
-                  onError={() => console.warn('❌ Erreur image produit:', product.image_url)}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center flex-col">
@@ -340,10 +326,10 @@ const ProductView: React.FC = () => {
                 </div>
               )}
 
-              {product.brand && (
+              {brand && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Marque</label>
-                  <p className="text-gray-900">{product.brand}</p>
+                  <p className="text-gray-900">{brand.name}</p>
                 </div>
               )}
 
@@ -371,22 +357,7 @@ const ProductView: React.FC = () => {
               </div>
             )}
 
-            {/* Spécifications */}
-            {product.specifications && Object.keys(product.specifications).length > 0 && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Spécifications</label>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="space-y-3">
-                    {Object.entries(product.specifications).map(([key, value]) => (
-                      <div key={key} className="flex justify-between items-center">
-                        <span className="font-medium text-gray-900">{key}</span>
-                        <span className="text-gray-600">{value}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Note: Spécifications seront ajoutées dans une future version */}
 
             {/* Métadonnées */}
             <div className="pt-4 border-t border-gray-200">

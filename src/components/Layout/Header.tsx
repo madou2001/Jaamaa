@@ -16,7 +16,7 @@ import AdvancedSearchBar from '../Search/AdvancedSearchBar'
 
 const Header: React.FC = () => {
   const { user, signOut } = useAuth()
-  const { cartItems, getCartItemsCount } = useLocalCart()
+  const { cartItems } = useLocalCart()
   const { getWishlistCount } = useWishlist()
   
   const navigate = useNavigate()
@@ -34,7 +34,7 @@ const Header: React.FC = () => {
           .order('name')
         setCategories(data || [])
       } catch (error) {
-        console.error('Erreur chargement catégories:', error)
+        // // console.error('Erreur chargement catégories:', error)
       }
     }
     loadCategories()
@@ -98,13 +98,13 @@ const Header: React.FC = () => {
 
               {/* Mega Dropdown Menu */}
               <div
-                className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-3 w-96 glass rounded-2xl shadow-2xl border border-white/20 overflow-hidden transition-all duration-500 z-50 ${
+                className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-3 w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden transition-all duration-500 z-50 ${
                   categoriesOpen ? 'opacity-100 visible transform translate-y-0 scale-100' : 'opacity-0 invisible transform translate-y-4 scale-95'
                 }`}
                 onMouseLeave={() => setCategoriesOpen(false)}
               >
                 {/* Header */}
-                <div className="bg-gradient-to-r from-primary-500/10 to-blue-500/10 p-4 border-b border-white/10">
+                <div className="bg-gradient-to-r from-primary-500/10 to-blue-500/10 p-4 border-b border-gray-200">
                   <h3 className="text-lg font-bold text-gray-900 mb-1">🛍️ Nos Catégories</h3>
                   <p className="text-sm text-gray-600">Découvrez nos produits par catégorie</p>
                 </div>

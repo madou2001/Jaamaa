@@ -57,7 +57,7 @@ const OrderManagement: React.FC = () => {
 
       setOrders(enrichedOrders)
     } catch (err) {
-      console.error('Erreur lors du chargement des commandes:', err)
+      // console.error('Erreur lors du chargement des commandes:', err)
       error('Erreur', 'Impossible de charger les commandes')
     } finally {
       setLoading(false)
@@ -79,7 +79,7 @@ const OrderManagement: React.FC = () => {
 
       success('Statut mis à jour', `Commande ${getStatusText(newStatus)}`)
     } catch (err) {
-      console.error('Erreur lors de la mise à jour du statut:', err)
+      // console.error('Erreur lors de la mise à jour du statut:', err)
       error('Erreur', 'Impossible de mettre à jour le statut')
     }
   }

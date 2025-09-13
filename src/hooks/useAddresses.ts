@@ -68,7 +68,7 @@ export const useAddresses = () => {
       setAddresses(transformedAddresses)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement des adresses')
-      console.error('Erreur lors du chargement des adresses:', err)
+      // console.error('Erreur lors du chargement des adresses:', err)
     } finally {
       setLoading(false)
     }

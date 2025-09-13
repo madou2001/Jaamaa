@@ -246,7 +246,9 @@ const Cart: React.FC = () => {
                     <span>Total</span>
                     <span>{total.toFixed(2)} €</span>
                   </div>
+
                 </div>
+
               </div>
 
               {subtotal < 50 && (

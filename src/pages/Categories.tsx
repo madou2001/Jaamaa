@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useInView } from 'framer-motion'
 import { 
@@ -9,23 +9,117 @@ import {
   Squares2X2Icon,
   ListBulletIcon,
   MagnifyingGlassIcon,
-  FunnelIcon
+  FunnelIcon,
+  ChevronRightIcon,
+  XMarkIcon,
+  FireIcon,
+  ChartBarIcon,
+  StarIcon
 } from '@heroicons/react/24/outline'
-import { useCategories } from '../hooks/useCategories'
+import { supabase } from '../lib/supabase'
+import { setSEO } from '../utils/seo'
+import OptimizedImage from '../components/UI/OptimizedImage'
+
+interface Category {
+  id: string
+  name: string
+  slug: string
+  description?: string
+  image_url?: string
+  created_at: string
+  updated_at: string
+}
 
 const Categories: React.FC = () => {
-  const { categories, loading } = useCategories()
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [searchTerm, setSearchTerm] = useState('')
-  const [sortBy, setSortBy] = useState<'name' | 'products'>('name')
+  const [sortBy, setSortBy] = useState<'name' | 'products' | 'recent'>('name')
+  const [showFilters, setShowFilters] = useState(false)
 
   // Animation refs
   const headerRef = useRef<HTMLDivElement>(null)
   const categoriesRef = useRef<HTMLDivElement>(null)
+  const statsRef = useRef<HTMLDivElement>(null)
 
   // InView animations
   const isHeaderInView = useInView(headerRef, { once: true, margin: "-100px" })
   const isCategoriesInView = useInView(categoriesRef, { once: true, margin: "-100px" })
+  const isStatsInView = useInView(statsRef, { once: true, margin: "-100px" })
+
+  // Icônes par catégorie (mapping par nom)
+  const categoryIcons: { [key: string]: string } = {
+    'électronique': '📱',
+    'vêtements': '👕',
+    'maison': '🏠',
+    'sport': '⚽',
+    'livres': '📚',
+    'jeux': '🎮',
+    'beauté': '💄',
+    'cuisine': '🍳',
+    'musique': '🎸',
+    'auto': '🚗',
+    'jardin': '🌱',
+    'art': '🎭',
+    'bijoux': '💎',
+    'bricolage': '🔧'
+  }
+
+  const getIconForCategory = (categoryName: string) => {
+    const name = categoryName.toLowerCase()
+    for (const [key, icon] of Object.entries(categoryIcons)) {
+      if (name.includes(key)) {
+        return icon
+      }
+    }
+    return '🛍️' // Icône par défaut
+  }
+
+  const mockStats = {
+    totalCategories: 0,
+    totalProducts: 0,
+    featuredCategories: 0,
+    newThisMonth: 0
+  }
+
+  useEffect(() => {
+    // SEO pour la page catégories
+    setSEO({
+      title: 'Toutes nos Catégories | Jaayma',
+      description: 'Explorez toutes nos catégories de produits premium. Électronique, mode, maison, sport et bien plus encore.',
+      keywords: 'catégories, produits, électronique, mode, maison, sport, shopping',
+      type: 'website'
+    })
+
+    fetchCategories()
+  }, [])
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      const { data, error: categoriesError } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name')
+
+      if (categoriesError) throw categoriesError
+      
+      setCategories(data || [])
+      mockStats.totalCategories = data?.length || 0
+      mockStats.featuredCategories = Math.floor((data?.length || 0) * 0.3)
+      mockStats.newThisMonth = Math.floor((data?.length || 0) * 0.1)
+      
+    } catch (err) {
+      console.error('Erreur chargement catégories:', err)
+      setError('Impossible de charger les catégories')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Filter and sort categories
   const filteredCategories = categories
@@ -34,422 +128,358 @@ const Categories: React.FC = () => {
       (category.description && category.description.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     .sort((a, b) => {
-      if (sortBy === 'name') {
+      switch (sortBy) {
+        case 'name':
         return a.name.localeCompare(b.name)
+        case 'recent':
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        case 'products':
+          // Simulation - dans un vrai projet, on aurait le nombre de produits
+          return Math.random() - 0.5
+        default:
+          return 0
       }
-      // Pour products, on simule un nombre (dans un vrai projet, on aurait cette donnée)
-      return Math.random() - 0.5
     })
 
-  // Icônes par catégorie (simulées)
-  const categoryIcons = ['🛍️', '📱', '👕', '🏠', '⚽', '📚', '🎮', '💄', '🍳', '🎸', '🚗', '🌱', '🎭', '💎', '🎨', '🔧']
+  const clearSearch = () => {
+    setSearchTerm('')
+  }
+
+  const getActiveFiltersCount = () => {
+    let count = 0
+    if (searchTerm) count++
+    if (sortBy !== 'name') count++
+    return count
+  }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <motion.div 
-            className="text-center mb-16"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="h-12 bg-gradient-to-r from-gray-200 to-gray-300 rounded-2xl w-1/3 mx-auto mb-6 smooth-loading"></div>
-            <div className="h-6 bg-gradient-to-r from-gray-200 to-gray-300 rounded-xl w-2/3 mx-auto smooth-loading"></div>
-          </motion.div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-64 mb-4"></div>
+            <div className="h-4 bg-gray-200 rounded w-96 mb-8"></div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
             {Array.from({ length: 12 }).map((_, index) => (
-              <motion.div 
-                key={index} 
-                className="glass rounded-3xl overflow-hidden"
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <div className="h-48 bg-gradient-to-br from-gray-200 to-gray-300 smooth-loading"></div>
-                <div className="p-6 space-y-3">
-                  <div className="h-6 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-3/4 smooth-loading"></div>
-                  <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-full smooth-loading"></div>
-                  <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-2/3 smooth-loading"></div>
+                <div key={index} className="aspect-square bg-gray-200 rounded-2xl"></div>
+              ))}
                 </div>
-              </motion.div>
-            ))}
           </div>
         </div>
       </div>
     )
   }
 
+  if (error) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
-      {/* HERO HEADER CINÉMATOGRAPHIQUE */}
-      <section className="relative py-20 overflow-hidden">
-        {/* Background with animated elements */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-600/10 via-blue-600/5 to-purple-600/10"></div>
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.05) 0%, transparent 50%)',
-          }}></div>
-        </div>
-
-        {/* Animated particles */}
-        <div className="absolute inset-0 overflow-hidden">
-          {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-primary-400 rounded-full opacity-30"
-              animate={{
-                y: [-20, -80],
-                opacity: [0, 1, 0],
-              }}
-              transition={{
-                duration: Math.random() * 3 + 2,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-            />
-          ))}
-        </div>
-
-        <div ref={headerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div 
-            className="text-center mb-12"
-            initial={{ opacity: 0, y: 50 }}
-            animate={isHeaderInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-            transition={{ duration: 1 }}
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50/30 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">😞</div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Erreur de chargement</h1>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <button
+            onClick={fetchCategories}
+            className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
           >
-            <motion.h1 
-              className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6"
-              initial={{ opacity: 0, y: 30 }}
-              animate={isHeaderInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-              transition={{ duration: 1, delay: 0.2 }}
-            >
-              <span className="bg-gradient-to-r from-primary-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
-          Nos Catégories
-              </span>
-            </motion.h1>
-            
-            <motion.p 
-              className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-8"
-              initial={{ opacity: 0, y: 30 }}
-              animate={isHeaderInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-              transition={{ duration: 1, delay: 0.4 }}
-            >
-              Explorez notre univers organisé en catégories soigneusement définies 
-              pour faciliter votre navigation et vos découvertes
-            </motion.p>
+            Réessayer
+          </button>
+        </div>
+        </div>
+    )
+  }
 
-            {/* Quick stats */}
-            <motion.div 
-              className="flex flex-wrap justify-center items-center gap-8 mt-12"
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50/30">
+      {/* Header */}
+      <section ref={headerRef} className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <motion.div 
               initial={{ opacity: 0, y: 30 }}
               animate={isHeaderInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-              transition={{ duration: 1, delay: 0.6 }}
-            >
-              {[
-                { icon: '📂', value: categories.length, label: 'Catégories' },
-                { icon: '🛍️', value: '500+', label: 'Produits' },
-                { icon: '🎯', value: '100%', label: 'Qualité' }
-              ].map((stat, index) => (
-                <motion.div 
-                  key={index}
-                  className="text-center glass p-6 rounded-2xl"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={isHeaderInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
-                >
-                  <div className="text-3xl mb-2">{stat.icon}</div>
-                  <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-                  <div className="text-sm text-gray-600">{stat.label}</div>
+            transition={{ duration: 0.8 }}
+          >
+            {/* Breadcrumb */}
+            <nav className="text-sm text-gray-600 mb-6">
+              <Link to="/" className="hover:text-indigo-600 transition-colors">Accueil</Link>
+              <ChevronRightIcon className="inline h-4 w-4 mx-2" />
+              <span className="text-gray-900 font-medium">Catégories</span>
+            </nav>
+
+            {/* Titre principal */}
+            <div className="text-center mb-12">
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={isHeaderInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-full text-indigo-700 text-sm font-medium mb-6"
+              >
+                <SparklesIcon className="w-4 h-4 mr-2" />
+                Explorez nos collections
                 </motion.div>
-              ))}
-            </motion.div>
+
+              <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+                Toutes nos <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Catégories</span>
+              </h1>
+              
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Découvrez notre large sélection de produits organisés par catégories pour faciliter votre shopping
+              </p>
+        </div>
+
+            {/* Barre de recherche et contrôles */}
+            <div className="flex flex-col lg:flex-row gap-4 max-w-4xl mx-auto">
+              {/* Recherche */}
+              <div className="flex-1 relative">
+                <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Rechercher une catégorie..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-12 pr-12 py-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 shadow-sm hover:shadow-md"
+                />
+                {searchTerm && (
+                  <button
+                    onClick={clearSearch}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <XMarkIcon className="h-5 w-5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Contrôles */}
+              <div className="flex items-center space-x-3">
+                {/* Bouton filtres */}
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`relative inline-flex items-center px-4 py-3 border rounded-xl font-medium transition-all duration-300 ${
+                    showFilters || getActiveFiltersCount() > 0
+                      ? 'border-indigo-500 text-indigo-600 bg-indigo-50 shadow-md'
+                      : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50 shadow-sm hover:shadow-md'
+                  }`}
+                >
+                  <FunnelIcon className="h-5 w-5 mr-2" />
+                  Filtres
+                  {getActiveFiltersCount() > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-indigo-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center">
+                      {getActiveFiltersCount()}
+                    </span>
+                  )}
+                </button>
+
+                {/* Tri */}
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="px-4 py-3 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 shadow-sm hover:shadow-md"
+                >
+                  <option value="name">Nom A-Z</option>
+                  <option value="products">Plus de produits</option>
+                  <option value="recent">Plus récentes</option>
+                </select>
+
+                {/* Mode d'affichage */}
+                <div className="flex border border-gray-300 rounded-xl overflow-hidden shadow-sm">
+                  <button
+                onClick={() => setViewMode('grid')}
+                    className={`p-3 transition-all duration-300 ${
+                  viewMode === 'grid'
+                        ? 'bg-indigo-500 text-white'
+                        : 'bg-white text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <Squares2X2Icon className="h-5 w-5" />
+                  </button>
+                  <button
+                onClick={() => setViewMode('list')}
+                    className={`p-3 transition-all duration-300 ${
+                  viewMode === 'list'
+                        ? 'bg-indigo-500 text-white'
+                        : 'bg-white text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <ListBulletIcon className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+      </div>
+      </section>
+
+      {/* Statistiques */}
+      <section ref={statsRef} className="py-12 bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={isStatsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={{ duration: 0.8 }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-6"
+          >
+            {[
+              { label: 'Catégories', value: mockStats.totalCategories, icon: FolderIcon, color: 'indigo' },
+              { label: 'Produits', value: '1,200+', icon: TagIcon, color: 'green' },
+              { label: 'Tendances', value: mockStats.featuredCategories, icon: ChartBarIcon, color: 'orange' },
+              { label: 'Nouveautés', value: mockStats.newThisMonth, icon: FireIcon, color: 'red' }
+            ].map((stat, index) => (
+            <motion.div 
+                key={stat.label}
+              initial={{ opacity: 0, scale: 0.8 }}
+                animate={isStatsInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="text-center bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300"
+                whileHover={{ y: -5 }}
+              >
+                <div className={`inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-${stat.color}-500 to-${stat.color}-600 rounded-xl mb-4`}>
+                  <stat.icon className="h-6 w-6 text-white" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</div>
+                <div className="text-sm text-gray-600">{stat.label}</div>
+              </motion.div>
+            ))}
           </motion.div>
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        {/* CONTROLS PREMIUM */}
-        <motion.div 
-          className="mb-12"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-            {/* Search & Filter */}
-            <div className="flex items-center space-x-4 flex-1 max-w-2xl">
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Rechercher une catégorie..."
-                  className="w-full px-5 py-4 pl-12 glass border-2 border-gray-200 rounded-2xl font-medium focus:border-primary-500 focus:ring-4 focus:ring-primary-500/20 focus:outline-none transition-all duration-300"
-                />
-                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 absolute left-4 top-4" />
-              </div>
-
-              <div className="relative">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as 'name' | 'products')}
-                  className="glass px-5 py-4 rounded-2xl font-semibold text-gray-700 border-2 border-gray-200 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/20 focus:outline-none transition-all duration-300 cursor-pointer"
-                >
-                  <option value="name">🔤 Par nom</option>
-                  <option value="products">📊 Par popularité</option>
-                </select>
-              </div>
-            </div>
-
-            {/* View Mode */}
-            <div className="glass rounded-2xl p-1 flex">
-              <motion.button
-                onClick={() => setViewMode('grid')}
-                className={`px-5 py-3 rounded-xl font-semibold transition-all duration-300 ${
-                  viewMode === 'grid'
-                    ? 'bg-gradient-to-r from-primary-500 to-blue-500 text-white shadow-lg'
-                    : 'text-gray-700 hover:bg-white/50'
-                }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Squares2X2Icon className="h-5 w-5" />
-              </motion.button>
-              <motion.button
-                onClick={() => setViewMode('list')}
-                className={`px-5 py-3 rounded-xl font-semibold transition-all duration-300 ${
-                  viewMode === 'list'
-                    ? 'bg-gradient-to-r from-primary-500 to-blue-500 text-white shadow-lg'
-                    : 'text-gray-700 hover:bg-white/50'
-                }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <ListBulletIcon className="h-5 w-5" />
-              </motion.button>
-            </div>
-      </div>
-
-          {/* Filter results info */}
-          {searchTerm && (
-            <motion.div 
-              className="mt-6 glass px-6 py-3 rounded-2xl inline-flex items-center"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
+      {/* Contenu principal */}
+      <section ref={categoriesRef} className="py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {filteredCategories.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center py-20"
             >
-              <FunnelIcon className="h-5 w-5 text-primary-500 mr-2" />
-              <span className="text-gray-700">
-                {filteredCategories.length} catégorie{filteredCategories.length > 1 ? 's' : ''} trouvée{filteredCategories.length > 1 ? 's' : ''} 
+              <div className="text-6xl mb-6">🔍</div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Aucune catégorie trouvée</h3>
+              <p className="text-gray-600 mb-6">
+                {searchTerm 
+                  ? `Aucune catégorie ne correspond à "${searchTerm}"`
+                  : 'Aucune catégorie disponible pour le moment'
+                }
+              </p>
                 {searchTerm && (
-                  <span className="font-semibold"> pour "{searchTerm}"</span>
-                )}
-              </span>
+                <button
+                  onClick={clearSearch}
+                  className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                >
+                  Effacer la recherche
+                </button>
+              )}
             </motion.div>
-          )}
-        </motion.div>
-
-        {/* CATEGORIES GRID/LIST PREMIUM */}
+          ) : (
         <motion.div 
-          ref={categoriesRef}
           initial={{ opacity: 0, y: 30 }}
           animate={isCategoriesInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.8 }}
-        >
-          {filteredCategories.length > 0 ? (
-            <div className={
-              viewMode === 'grid' 
-                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8' 
-                : 'space-y-6'
-            }>
+              className={`grid gap-6 ${
+                viewMode === 'grid' 
+                  ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6' 
+                  : 'grid-cols-1 max-w-4xl mx-auto'
+              }`}
+            >
               {filteredCategories.map((category, index) => (
           <motion.div
             key={category.id}
-                  initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, scale: 0.8, rotateY: -20 }}
+                  animate={isCategoriesInView ? { opacity: 1, scale: 1, rotateY: 0 } : { opacity: 0, scale: 0.8, rotateY: -20 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   className="group"
+                  whileHover={{ y: -10, scale: 1.05 }}
           >
             <Link
               to={`/products?category=${category.id}`}
-                    className={`block glass rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 ${
-                      viewMode === 'list' ? 'flex' : ''
+                    className={`block relative bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 ${
+                      viewMode === 'list' ? 'flex items-center p-6' : 'aspect-square p-6'
                     }`}
                   >
-                    {/* Image/Icon */}
-                    <div className={`relative bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden ${
-                      viewMode === 'list' ? 'w-48 h-32' : 'h-48'
-                    }`}>
+                    {/* Background glow */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    {/* Contenu */}
+                    <div className={`relative z-10 h-full flex ${viewMode === 'list' ? 'items-center' : 'flex-col items-center justify-center'} text-center`}>
+                      {/* Image ou icône */}
+                      <div className={`${viewMode === 'list' ? 'w-16 h-16 mr-6' : 'mb-4'} flex-shrink-0`}>
                   {category.image_url ? (
-                    <img
+                          <OptimizedImage
                       src={category.image_url}
                       alt={category.name}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                            className={`w-full h-full object-cover rounded-2xl group-hover:scale-110 transition-transform duration-300`}
+                            fallbackSrc="/placeholder-product.svg"
                     />
                   ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <motion.div
-                            className="text-6xl"
-                            whileHover={{ 
-                              scale: 1.2,
-                              rotate: [0, 10, -10, 0]
-                            }}
-                            transition={{ duration: 0.5 }}
-                          >
-                            {categoryIcons[index % categoryIcons.length]}
-                          </motion.div>
-                        </div>
-                      )}
-                      
-                      {/* Gradient overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      
-                      {/* Category count badge */}
-                      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <div className="bg-white/90 backdrop-blur-sm text-gray-900 font-bold px-3 py-1 rounded-xl shadow-lg text-sm">
-                          {Math.floor(Math.random() * 50) + 10} produits
-                        </div>
-                      </div>
-
-                      {/* Featured badge (pour certaines catégories) */}
-                      {index < 3 && (
-                        <div className="absolute top-4 left-4">
-                          <motion.div 
-                            className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"
-                            animate={{ 
-                              scale: [1, 1.05, 1],
-                            }}
-                            transition={{ 
-                              duration: 2,
-                              repeat: Infinity,
-                              repeatType: "reverse"
-                            }}
-                          >
-                            ⭐ POPULAIRE
-                          </motion.div>
+                          <div className={`${viewMode === 'list' ? 'text-4xl' : 'text-6xl'} group-hover:scale-125 transition-transform duration-300 filter drop-shadow-sm`}>
+                            {getIconForCategory(category.name)}
                     </div>
                   )}
-                </div>
-
-                    {/* Content */}
-                    <div className="p-8 flex-1">
-                      <div className="flex items-center mb-3">
-                        <TagIcon className="h-5 w-5 text-primary-500 mr-2" />
-                        <span className="text-sm text-primary-600 font-semibold">Catégorie</span>
                       </div>
                       
-                      <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-primary-600 transition-colors">
+                      {/* Texte */}
+                      <div className={`${viewMode === 'list' ? 'flex-1 text-left' : ''}`}>
+                        <h3 className={`font-bold text-gray-900 group-hover:text-indigo-600 transition-colors ${
+                          viewMode === 'list' ? 'text-xl mb-2' : 'text-sm md:text-base mb-2'
+                        }`}>
                     {category.name}
                   </h3>
                       
-                  {category.description && (
-                        <p className="text-gray-600 mb-6 line-clamp-3 leading-relaxed">
+                        {category.description && viewMode === 'list' && (
+                          <p className="text-gray-600 text-sm line-clamp-2 mb-3">
                       {category.description}
                     </p>
                   )}
                       
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center text-primary-600 font-bold group-hover:text-primary-700 transition-colors">
-                          <SparklesIcon className="h-5 w-5 mr-2" />
-                          <span>Découvrir</span>
+                        {/* Badges */}
+                        <div className={`flex ${viewMode === 'list' ? 'justify-start' : 'justify-center'} items-center space-x-2`}>
+                          <span className="bg-indigo-100 text-indigo-700 text-xs font-medium px-2 py-1 rounded-full">
+                            {Math.floor(Math.random() * 50) + 10}+ produits
+                          </span>
+                          {Math.random() > 0.7 && (
+                            <span className="bg-orange-100 text-orange-700 text-xs font-medium px-2 py-1 rounded-full">
+                              <FireIcon className="inline w-3 h-3 mr-1" />
+                              Tendance
+                            </span>
+                          )}
                   </div>
                         
-                        <motion.div
-                          className="bg-gradient-to-r from-primary-500 to-blue-500 p-3 rounded-full text-white shadow-lg group-hover:shadow-xl transition-all duration-300"
-                          whileHover={{ scale: 1.1, rotate: 45 }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          <ArrowRightIcon className="h-5 w-5" />
-                        </motion.div>
+                        {viewMode === 'list' && (
+                          <div className="flex items-center text-indigo-600 text-sm font-medium mt-3 group-hover:translate-x-2 transition-transform duration-300">
+                            Voir les produits
+                            <ArrowRightIcon className="w-4 h-4 ml-1" />
+                          </div>
+                        )}
                 </div>
               </div>
+
+                    {/* Effet de brillance */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 rounded-3xl"></div>
             </Link>
           </motion.div>
         ))}
-      </div>
-          ) : (
-            <motion.div 
-              className="text-center py-20"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8 }}
-            >
-              <div className="glass rounded-3xl p-16 max-w-md mx-auto">
-                <div className="text-8xl mb-8">🔍</div>
-                <h3 className="text-3xl font-bold text-gray-900 mb-4">Aucune catégorie trouvée</h3>
-                <p className="text-gray-600 mb-8 text-lg">
-                  {searchTerm 
-                    ? `Aucune catégorie ne correspond à "${searchTerm}"`
-                    : "Les catégories seront bientôt disponibles."
-                  }
-                </p>
-                {searchTerm && (
-                  <motion.button
-                    onClick={() => setSearchTerm('')}
-                    className="bg-gradient-to-r from-primary-500 to-blue-600 text-white px-8 py-4 rounded-xl font-bold hover:shadow-xl transition-all duration-300"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    ✨ Voir toutes les catégories
-                  </motion.button>
-                )}
-              </div>
             </motion.div>
           )}
-        </motion.div>
 
-        {/* CTA Section */}
+          {/* CTA */}
         {filteredCategories.length > 0 && (
           <motion.div 
-            className="text-center mt-20"
+              className="text-center mt-16"
             initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            viewport={{ once: true }}
-          >
-            <div className="glass rounded-3xl p-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                Vous ne trouvez pas ce que vous cherchez ?
-              </h2>
-              <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-                Explorez tous nos produits ou contactez notre équipe pour des recommandations personnalisées
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+              animate={isCategoriesInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 1, delay: 0.5 }}
                 >
                   <Link 
                     to="/products" 
-                    className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary-500 to-blue-600 text-white text-lg font-bold rounded-2xl hover:shadow-2xl transition-all duration-300 hover-lift"
+                className="group inline-flex items-center px-8 py-4 text-lg font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full hover:shadow-2xl hover:shadow-indigo-500/25 transition-all duration-300 hover:scale-105"
                   >
-                    <FolderIcon className="h-6 w-6 mr-3" />
-                    Voir tous les produits
+                <StarIcon className="w-6 h-6 mr-2 group-hover:rotate-180 transition-transform duration-500" />
+                Découvrir Tous les Produits
+                <ArrowRightIcon className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </motion.div>
-                
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Link 
-                    to="/contact" 
-                    className="inline-flex items-center px-8 py-4 glass text-gray-700 text-lg font-semibold rounded-2xl hover:bg-white transition-all duration-300 border-2 border-gray-200 hover:border-gray-300"
-                  >
-                    💬 Nous contacter
-                  </Link>
-                </motion.div>
-          </div>
+          )}
         </div>
-          </motion.div>
-      )}
-      </div>
+      </section>
     </div>
   )
 }

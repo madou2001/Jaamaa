@@ -56,7 +56,7 @@ const AdvancedSearchBar: React.FC<AdvancedSearchBarProps> = ({
           const newSuggestions = await generateSuggestions(query)
           setSuggestions(newSuggestions)
         } catch (error) {
-          console.error('Erreur suggestions:', error)
+          // console.error('Erreur suggestions:', error)
         } finally {
           setLoading(false)
         }

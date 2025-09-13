@@ -234,7 +234,7 @@ export const usePromotions = () => {
       }
 
     } catch (error) {
-      console.error('Erreur validation code promo:', error)
+      // console.error('Erreur validation code promo:', error)
       return {
         id: '',
         code,

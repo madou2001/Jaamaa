@@ -24,12 +24,11 @@ export const useLocalCart = () => {
       if (savedCart) {
         const parsedCart = JSON.parse(savedCart)
         setCartItems(parsedCart)
-        console.log('🛒 Panier chargé:', parsedCart)
       } else {
-        console.log('🛒 Panier vide ou inexistant')
+        // // console.log('🛒 Panier vide ou inexistant')
       }
     } catch (error) {
-      console.error('Erreur lors du chargement du panier:', error)
+      // // console.error('Erreur lors du chargement du panier:', error)
     } finally {
       setInitialized(true)
     }
@@ -44,10 +43,10 @@ export const useLocalCart = () => {
           // Utiliser setTimeout pour éviter les mises à jour pendant le rendu
           setTimeout(() => {
             setCartItems(newCart)
-            console.log('🛒 Panier synchronisé depuis storage:', newCart)
+            // // console.log('🛒 Panier synchronisé depuis storage:', newCart)
           }, 0)
         } catch (error) {
-          console.error('Erreur sync storage:', error)
+          // // console.error('Erreur sync storage:', error)
         }
       }
     }
@@ -59,7 +58,7 @@ export const useLocalCart = () => {
       // Utiliser setTimeout pour éviter les mises à jour pendant le rendu
       setTimeout(() => {
         setCartItems(e.detail)
-        console.log('🛒 Panier synchronisé depuis event:', e.detail)
+        // // console.log('🛒 Panier synchronisé depuis event:', e.detail)
       }, 0)
     }
 
@@ -78,7 +77,7 @@ export const useLocalCart = () => {
       // Déclencher un événement custom pour synchroniser les autres composants
       window.dispatchEvent(new CustomEvent('cart-updated', { detail: items }))
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde du panier:', error)
+      // // console.error('Erreur lors de la sauvegarde du panier:', error)
     }
   }
 
@@ -125,7 +124,7 @@ export const useLocalCart = () => {
         return newItems
       })
     } catch (error) {
-      console.error('Erreur lors de l\'ajout au panier:', error)
+      // // console.error('Erreur lors de l\'ajout au panier:', error)
       throw error
     } finally {
       setLoading(false)

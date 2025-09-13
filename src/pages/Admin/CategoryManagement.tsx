@@ -89,7 +89,6 @@ const CategoryManagement: React.FC = () => {
 
       setCategories(enrichedCategories)
     } catch (err) {
-      console.error('Erreur lors du chargement des catégories:', err)
       error('Erreur', 'Impossible de charger les catégories')
     } finally {
       setLoading(false)
@@ -206,7 +205,6 @@ const CategoryManagement: React.FC = () => {
       setShowModal(false)
       resetForm()
     } catch (err) {
-      console.error('Erreur lors de la sauvegarde:', err)
       error('Erreur', 'Impossible de sauvegarder la catégorie')
     } finally {
       setFormLoading(false)
@@ -236,7 +234,6 @@ const CategoryManagement: React.FC = () => {
       setCategories(prev => prev.filter(cat => cat.id !== categoryId))
       success('Catégorie supprimée', 'La catégorie a été supprimée avec succès')
     } catch (err) {
-      console.error('Erreur lors de la suppression:', err)
       error('Erreur', 'Impossible de supprimer la catégorie')
     }
   }
@@ -264,7 +261,6 @@ const CategoryManagement: React.FC = () => {
         `La catégorie a été ${newStatus ? 'activée' : 'désactivée'} avec succès`
       )
     } catch (err) {
-      console.error('Erreur lors de la mise à jour du statut:', err)
       error('Erreur', 'Impossible de mettre à jour le statut')
     }
   }

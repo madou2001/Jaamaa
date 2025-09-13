@@ -5,7 +5,7 @@ export const useErrorHandler = () => {
   const { showError } = useToast()
 
   const handleError = useCallback((error: any, customMessage?: string) => {
-    console.error('Error:', error)
+    // console.error('Error:', error)
     
     let message = customMessage || 'Une erreur est survenue'
     
