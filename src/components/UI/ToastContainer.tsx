@@ -13,7 +13,7 @@ const ToastContainer: React.FC = () => {
           <Toast
             key={toast.id}
             {...toast}
-            onClose={removeToast}
+            onClose={() => removeToast(toast.id)}
           />
         ))}
       </AnimatePresence>

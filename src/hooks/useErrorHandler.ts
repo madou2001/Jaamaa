@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { useToast } from './useToast'
 
 export const useErrorHandler = () => {
-  const { showError } = useToast()
+  const { error: showError } = useToast()
 
   const handleError = useCallback((error: any, customMessage?: string) => {
     // console.error('Error:', error)

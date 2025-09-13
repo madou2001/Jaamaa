@@ -47,7 +47,7 @@ export const setSEO = ({
   updatePropertyTag('og:title', title)
   updatePropertyTag('og:description', description)
   updatePropertyTag('og:image', image)
-  updatePropertyTag('og:url', url)
+  updatePropertyTag('og:url', url || window.location.href)
   updatePropertyTag('og:type', type)
   updatePropertyTag('og:site_name', 'Jaayma')
 

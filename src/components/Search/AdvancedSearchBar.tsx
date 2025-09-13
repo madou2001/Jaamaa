@@ -285,8 +285,10 @@ const AdvancedSearchBar: React.FC<AdvancedSearchBarProps> = ({
                             alt={suggestion.label}
                             className="w-8 h-8 object-cover rounded mr-3"
                             onError={(e) => {
-                              e.currentTarget.style.display = 'none'
-                              e.currentTarget.nextElementSibling!.style.display = 'flex'
+                              const target = e.currentTarget as HTMLImageElement
+                              target.style.display = 'none'
+                              const nextSibling = target.nextElementSibling as HTMLElement
+                              if (nextSibling) nextSibling.style.display = 'flex'
                             }}
                           />
                         ) : null}
