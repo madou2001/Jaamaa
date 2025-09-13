@@ -1,3 +1,5 @@
+import React from 'react'
+
 // Système de cache intelligent pour optimiser les performances
 interface CacheItem<T> {
   data: T

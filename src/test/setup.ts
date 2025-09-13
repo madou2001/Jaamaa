@@ -5,6 +5,23 @@ import * as matchers from '@testing-library/jest-dom/matchers'
 // Extend Vitest's expect with jest-dom matchers
 expect.extend(matchers)
 
+// Add types for jest-dom matchers
+declare global {
+  namespace Vi {
+    interface JestAssertion<T = any>
+      extends jest.Matchers<void, T>,
+        TestingLibraryMatchers<T, void> {}
+  }
+}
+
+interface TestingLibraryMatchers<R = unknown, T = {}> {
+  toBeInTheDocument(): R
+  toHaveTextContent(text: string | RegExp): R
+  toBeVisible(): R
+  toBeDisabled(): R
+  toBeEnabled(): R
+}
+
 // Cleanup after each test
 afterEach(() => {
   cleanup()

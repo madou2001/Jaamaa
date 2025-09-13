@@ -59,7 +59,7 @@ const ModernHero: React.FC<HeroProps> = ({ stats }) => {
       opacity: 1,
       transition: {
         duration: 0.6,
-        ease: [0.6, -0.05, 0.01, 0.99]
+        ease: "easeOut"
       }
     }
   }
@@ -175,7 +175,7 @@ const ModernHero: React.FC<HeroProps> = ({ stats }) => {
             { label: 'Produits Premium', value: `${stats.totalProducts}+`, icon: '🏆' },
             { label: 'Catégories', value: `${stats.totalCategories}+`, icon: '📦' },
             { label: 'Produits Vedettes', value: stats.featuredProducts, icon: '⭐' }
-          ].map((stat, index) => (
+          ].map((stat) => (
             <motion.div
               key={stat.label}
               className="text-center glass rounded-2xl p-6 min-w-[140px]"

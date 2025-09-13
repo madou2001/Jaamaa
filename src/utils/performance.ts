@@ -1,3 +1,5 @@
+import React from 'react'
+
 // Utilitaires d'optimisation des performances
 
 // Debounce pour limiter les appels d'API
