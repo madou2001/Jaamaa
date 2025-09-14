@@ -1,10 +1,11 @@
 name: Deploy to Production
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+# Temporarily disabled due to billing issues
+# on:
+#   push:
+#     branches: [ main ]
+#   pull_request:
+#     branches: [ main ]
 
 jobs:
   test:
