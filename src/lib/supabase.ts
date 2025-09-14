@@ -24,7 +24,7 @@ try {
   throw new Error(`Invalid Supabase URL: ${supabaseUrl}. Must be a valid HTTP or HTTPS URL.`)
 }
 
-console.log('✅ Supabase configuration loaded successfully - DEPLOYMENT FIXED')
+console.log(`✅ Supabase configuration loaded successfully - DEPLOYMENT FIXED - ${new Date().toISOString()}`)
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
 
