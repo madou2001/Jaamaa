@@ -2,8 +2,8 @@ import { createClient } from '@supabase/supabase-js'
 import type { Database } from './supabase-types'
 
 // Utiliser les variables d'environnement ou fallback vers la config
-const supabaseUrl = 'https://puunqnkzwxandgovuivw.supabase.co'
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1dW5xbmt6d3hhbmRnb3Z1aXp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2OTAyNjcsImV4cCI6MjA3MzI2NjI2N30.2HaATSNaGm4Y8mqBj759Phd5zK3JLfyTM0r3RopPNcc'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://puunqnkzwxandgovuivw.supabase.co'
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1dW5xbmt6d3hhbmRnb3Z1aXp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2OTAyNjcsImV4cCI6MjA3MzI2NjI2N30.2HaATSNaGm4Y8mqBj759Phd5zK3JLfyTM0r3RopPNcc'
 
 // Validation plus robuste des variables d'environnement
 if (!supabaseUrl) {
@@ -24,7 +24,7 @@ try {
   throw new Error(`Invalid Supabase URL: ${supabaseUrl}. Must be a valid HTTP or HTTPS URL.`)
 }
 
-console.log('✅ Supabase configuration loaded successfully')
+console.log('✅ Supabase configuration loaded successfully - DEPLOYMENT FIXED')
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
 
