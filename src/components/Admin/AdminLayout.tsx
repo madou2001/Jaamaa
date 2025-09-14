@@ -61,6 +61,12 @@ const AdminLayout: React.FC = () => {
       current: location.pathname.startsWith('/admin/customers')
     },
     {
+      name: 'Utilisateurs',
+      href: '/admin/users',
+      icon: UsersIcon,
+      current: location.pathname.startsWith('/admin/users')
+    },
+    {
       name: 'Catégories',
       href: '/admin/categories',
       icon: TagIcon,

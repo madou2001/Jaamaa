@@ -13,11 +13,9 @@ export const testImageLoad = (url: string): Promise<boolean> => {
   return new Promise((resolve) => {
     const img = new Image()
     img.onload = () => {
-      // console.log('✅ Image disponible:', url)
       resolve(true)
     }
     img.onerror = () => {
-      // console.log('❌ Image indisponible:', url)
       resolve(false)
     }
     img.src = url
@@ -25,13 +23,11 @@ export const testImageLoad = (url: string): Promise<boolean> => {
 }
 
 export const testAllImages = async (): Promise<void> => {
-  // console.log('🧪 Test de disponibilité des images...')
   
   for (const url of testImageUrls) {
     await testImageLoad(url)
   }
   
-  // console.log('🏁 Test terminé')
 }
 
 // Fonction à appeler dans la console pour tester

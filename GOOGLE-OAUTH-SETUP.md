@@ -127,3 +127,4 @@ Une fois cette configuration terminée, l'implémentation frontend fonctionnera 
 
 **⏱️ Temps estimé de configuration : 15-20 minutes**
 
+

@@ -14,9 +14,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../hooks/useAuth'
 import { useLocalCart } from '../hooks/useLocalCart'
 import { useWishlist } from '../hooks/useWishlist'
-import { useToast } from '../hooks/useToast'
 import { supabase } from '../lib/supabase'
-import ToastContainer from '../components/UI/Toast'
 import AddressForm from '../components/Forms/AddressForm'
 
 interface UserProfile {
@@ -46,7 +44,6 @@ const Profile: React.FC = () => {
   const { user, signOut } = useAuth()
   const { } = useLocalCart()
   const { getWishlistCount } = useWishlist()
-  const { toasts, removeToast, success, error } = useToast()
 
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'addresses' | 'settings'>('profile')
   const [loading, setLoading] = useState(false)
@@ -106,7 +103,6 @@ const Profile: React.FC = () => {
         .single()
 
       if (profileError && profileError.code !== 'PGRST116') { // PGRST116 = no rows returned
-        // console.error('Erreur lors du chargement du profil:', profileError)
         // Fallback vers localStorage
         const savedProfile = localStorage.getItem('user_profile')
         if (savedProfile) {
@@ -147,7 +143,6 @@ const Profile: React.FC = () => {
         .order('created_at', { ascending: false })
 
       if (addressesError) {
-        // console.error('Erreur lors du chargement des adresses:', addressesError)
         // Fallback vers localStorage
         const savedAddresses = localStorage.getItem('user_addresses')
         if (savedAddresses) {
@@ -169,7 +164,6 @@ const Profile: React.FC = () => {
         setAddresses(transformedAddresses)
       }
     } catch (err) {
-      // console.error('Erreur lors du chargement des données utilisateur:', err)
       // Fallback vers localStorage
       const savedProfile = localStorage.getItem('user_profile')
       if (savedProfile) {
@@ -197,7 +191,6 @@ const Profile: React.FC = () => {
                 allOrders.push(JSON.parse(orderData))
               }
             } catch (error) {
-              // console.error('Erreur lors du chargement de la commande:', error)
             }
           }
         }
@@ -218,7 +211,6 @@ const Profile: React.FC = () => {
         .order('created_at', { ascending: false })
 
       if (ordersError) {
-        // console.error('Erreur lors du chargement des commandes:', ordersError)
         // Fallback vers localStorage en cas d'erreur
         const allOrders = []
         for (let i = 0; i < localStorage.length; i++) {
@@ -230,7 +222,6 @@ const Profile: React.FC = () => {
                 allOrders.push(JSON.parse(orderData))
               }
             } catch (error) {
-              // console.error('Erreur lors du chargement de la commande:', error)
             }
           }
         }
@@ -279,8 +270,6 @@ const Profile: React.FC = () => {
       setOrders(transformedOrders)
       setOrdersLoading(false)
     } catch (err) {
-      // console.error('Erreur lors du chargement des commandes:', err)
-      error('Erreur', 'Impossible de charger vos commandes')
       setOrdersLoading(false)
     }
   }
@@ -293,13 +282,10 @@ const Profile: React.FC = () => {
       if (!user) {
         // Fallback vers localStorage si pas d'utilisateur connecté
         localStorage.setItem('user_profile', JSON.stringify(profile))
-        success('Profil mis à jour', 'Vos informations ont été sauvegardées localement')
         setLoading(false)
         return
       }
 
-      // console.log('🔐 Utilisateur connecté:', user.id, user.email)
-      // console.log('📝 Données à sauvegarder:', {
       //   id: user.id,
       //   email: user.email,
       //   first_name: profile.firstName,
@@ -315,7 +301,6 @@ const Profile: React.FC = () => {
         .eq('id', user.id)
         .single()
 
-      // console.log('🔍 Profil existant:', existingProfile, 'Erreur check:', checkError)
 
       // Sauvegarder le profil dans Supabase (sans les champs manquants temporairement)
       const { error: profileError } = await supabase
@@ -334,11 +319,8 @@ const Profile: React.FC = () => {
         } as any)
 
       if (profileError) {
-        // console.error('🚨 Erreur lors de la sauvegarde du profil:', profileError)
         if (profileError.code === '42501') {
-          error('Erreur de permissions', 'Veuillez configurer les politiques RLS dans Supabase')
         } else {
-          throw new Error('Erreur lors de la sauvegarde du profil')
         }
         return
       }
@@ -346,10 +328,7 @@ const Profile: React.FC = () => {
       // Sauvegarder aussi dans localStorage comme backup
       localStorage.setItem('user_profile', JSON.stringify(profile))
       
-      success('Profil mis à jour', 'Vos informations ont été sauvegardées avec succès')
     } catch (err) {
-      // console.error('Erreur lors de la sauvegarde:', err)
-      error('Erreur', 'Impossible de sauvegarder le profil')
     } finally {
       setLoading(false)
     }
@@ -359,12 +338,10 @@ const Profile: React.FC = () => {
     e.preventDefault()
 
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      error('Erreur', 'Les mots de passe ne correspondent pas')
       return
     }
 
     if (passwordForm.newPassword.length < 6) {
-      error('Erreur', 'Le mot de passe doit contenir au moins 6 caractères')
       return
     }
 
@@ -374,9 +351,7 @@ const Profile: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
       
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
-      success('Mot de passe modifié', 'Votre mot de passe a été mis à jour')
     } catch (err) {
-      error('Erreur', 'Impossible de modifier le mot de passe')
     } finally {
       setLoading(false)
     }
@@ -398,12 +373,10 @@ const Profile: React.FC = () => {
           )
           setAddresses(updatedAddresses)
           localStorage.setItem('user_addresses', JSON.stringify(updatedAddresses))
-          success('Adresse modifiée', 'Votre adresse a été mise à jour localement')
         } else {
           const updatedAddresses = [...addresses, newAddress]
           setAddresses(updatedAddresses)
           localStorage.setItem('user_addresses', JSON.stringify(updatedAddresses))
-          success('Adresse ajoutée', 'Votre nouvelle adresse a été ajoutée localement')
         }
 
         setShowAddressForm(false)
@@ -412,8 +385,6 @@ const Profile: React.FC = () => {
         return
       }
 
-      // console.log('💾 Sauvegarde adresse pour utilisateur:', user.id)
-      // console.log('📝 Données adresse:', addressData)
 
       // Si c'est l'adresse par défaut, désactiver les autres
       if (addressData.isDefault) {
@@ -425,7 +396,6 @@ const Profile: React.FC = () => {
           .neq('id', editingAddress?.id || '') as any)
         
         if (updateError) {
-          // console.warn('Erreur lors de la mise à jour des adresses par défaut:', updateError)
         }
       }
 
@@ -464,31 +434,23 @@ const Profile: React.FC = () => {
       }
 
       if (result.error) {
-        // console.error('🚨 Erreur lors de la sauvegarde de l\'adresse:', result.error)
         if (result.error.code === '42501') {
-          error('Erreur de permissions', 'Veuillez configurer les politiques RLS pour les adresses')
         } else {
-          throw new Error('Erreur lors de la sauvegarde de l\'adresse')
         }
         return
       }
 
-      // console.log('✅ Adresse sauvegardée:', result.data)
 
       // Recharger toutes les adresses depuis Supabase pour être sûr
       await loadUserData()
 
       if (editingAddress) {
-        success('Adresse modifiée', 'Votre adresse a été mise à jour avec succès')
       } else {
-        success('Adresse ajoutée', 'Votre nouvelle adresse a été ajoutée avec succès')
       }
 
       setShowAddressForm(false)
       setEditingAddress(null)
     } catch (err) {
-      // console.error('❌ Erreur lors de la sauvegarde de l\'adresse:', err)
-      error('Erreur', 'Impossible de sauvegarder l\'adresse')
     } finally {
       setAddressLoading(false)
     }
@@ -506,8 +468,6 @@ const Profile: React.FC = () => {
             .eq('user_id', user.id)
 
           if (deleteError) {
-            // console.error('Erreur lors de la suppression de l\'adresse:', deleteError)
-            error('Erreur', 'Impossible de supprimer l\'adresse')
             return
           }
         }
@@ -516,10 +476,7 @@ const Profile: React.FC = () => {
         const updatedAddresses = addresses.filter(addr => addr.id !== addressId)
         setAddresses(updatedAddresses)
         localStorage.setItem('user_addresses', JSON.stringify(updatedAddresses))
-        success('Adresse supprimée', 'L\'adresse a été supprimée')
       } catch (err) {
-        // console.error('Erreur lors de la suppression de l\'adresse:', err)
-        error('Erreur', 'Impossible de supprimer l\'adresse')
       }
     }
   }
@@ -1075,7 +1032,6 @@ const Profile: React.FC = () => {
       />
 
       {/* Toast Notifications */}
-      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   )
 }

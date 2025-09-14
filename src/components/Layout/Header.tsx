@@ -9,6 +9,7 @@ import {
   ChevronDownIcon
 } from '@heroicons/react/24/outline'
 import { useAuth } from '../../hooks/useAuth'
+import { useRole } from '../../hooks/useRole'
 import { useLocalCart } from '../../hooks/useLocalCart'
 import { useWishlist } from '../../hooks/useWishlist'
 import { supabase } from '../../lib/supabase'
@@ -16,6 +17,7 @@ import AdvancedSearchBar from '../Search/AdvancedSearchBar'
 
 const Header: React.FC = () => {
   const { user, signOut } = useAuth()
+  const { isAdmin } = useRole()
   const { cartItems } = useLocalCart()
   const { getWishlistCount } = useWishlist()
   
@@ -34,7 +36,6 @@ const Header: React.FC = () => {
           .order('name')
         setCategories(data || [])
       } catch (error) {
-        // // console.error('Erreur chargement catégories:', error)
       }
     }
     loadCategories()
@@ -246,6 +247,17 @@ const Header: React.FC = () => {
                   >
                     Mes Commandes
                   </Link>
+                  
+                  {/* Bouton Administrateur - Visible seulement pour les admins */}
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      className="block px-4 py-2 text-sm text-white bg-indigo-600 hover:bg-indigo-700 font-medium"
+                    >
+                      🛡️ Administrateur
+                    </Link>
+                  )}
+                  
                   <button
                     onClick={handleSignOut}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -307,6 +319,50 @@ const Header: React.FC = () => {
               >
                 📦 Produits
               </Link>
+              
+              {/* Menu utilisateur mobile */}
+              {user && (
+                <div className="px-4 py-2 border-t border-white/20">
+                  <p className="text-sm font-semibold text-gray-600 mb-2">👤 Mon Compte</p>
+                  <div className="space-y-1">
+                    <Link
+                      to="/profile"
+                      className="block text-gray-600 hover:text-primary-600 text-sm py-2 px-3 hover:bg-white/20 rounded transition-all"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Mon Profil
+                    </Link>
+                    <Link
+                      to="/orders"
+                      className="block text-gray-600 hover:text-primary-600 text-sm py-2 px-3 hover:bg-white/20 rounded transition-all"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Mes Commandes
+                    </Link>
+                    
+                    {/* Bouton Administrateur mobile */}
+                    {isAdmin && (
+                      <Link
+                        to="/admin"
+                        className="block text-white bg-indigo-600 hover:bg-indigo-700 text-sm py-2 px-3 rounded font-medium transition-all"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        🛡️ Administrateur
+                      </Link>
+                    )}
+                    
+                    <button
+                      onClick={() => {
+                        handleSignOut()
+                        setIsMobileMenuOpen(false)
+                      }}
+                      className="block w-full text-left text-gray-600 hover:text-red-600 text-sm py-2 px-3 hover:bg-white/20 rounded transition-all"
+                    >
+                      Se déconnecter
+                    </button>
+                  </div>
+                </div>
+              )}
               
               <div className="px-4 py-2">
                 <p className="text-sm font-semibold text-gray-600 mb-2">📂 Catégories</p>

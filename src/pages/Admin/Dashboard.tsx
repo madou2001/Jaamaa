@@ -10,6 +10,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { motion } from 'framer-motion'
 import { supabase } from '../../lib/supabase'
+import SecurityInfo from '../../components/Admin/SecurityInfo'
 
 interface DashboardStats {
   totalRevenue: number
@@ -95,7 +96,6 @@ const Dashboard: React.FC = () => {
       setRecentOrders(recentOrdersData)
 
     } catch (error) {
-      // console.error('Erreur lors du chargement des données:', error)
     } finally {
       setLoading(false)
     }
@@ -182,6 +182,9 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Security Info */}
+      <SecurityInfo />
+      
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">

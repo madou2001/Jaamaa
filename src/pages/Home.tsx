@@ -24,12 +24,10 @@ import {
   StarIcon as StarSolidIcon
 } from '@heroicons/react/24/solid'
 import { supabase } from '../lib/supabase'
-import { useToast } from '../hooks/useToast'
 import { useLocalCart } from '../hooks/useLocalCart'
 import { useWishlist } from '../hooks/useWishlist'
 import { useOptimizedProducts } from '../hooks/useOptimizedProducts'
 import { useOptimizedCategories } from '../hooks/useOptimizedCategories'
-import ToastContainer from '../components/UI/Toast'
 import OptimizedImage from '../components/UI/OptimizedImage'
 import AnimatedCounter from '../components/UI/AnimatedCounter'
 import { ProductsGridSkeleton } from '../components/UI/LoadingStates'
@@ -63,7 +61,6 @@ const Home: React.FC = () => {
 
   const loading = productsLoading || categoriesLoading
   
-  const { toasts, removeToast, success, error } = useToast()
   const { addToCart: addToLocalCart, isInCart } = useLocalCart()
   const { addToWishlist, isInWishlist } = useWishlist()
 
@@ -234,7 +231,6 @@ const Home: React.FC = () => {
       setAddingToCart(productId)
       const product = featuredProducts.find(p => p.id === productId)
       if (!product) {
-        error('Erreur', 'Produit introuvable')
         return
       }
 
@@ -245,9 +241,7 @@ const Home: React.FC = () => {
         image_url: product.image_url || undefined
       })
 
-      success('Produit ajouté !', `${product.name} a été ajouté à votre panier`)
     } catch (err) {
-      error('Erreur', 'Impossible d\'ajouter le produit au panier')
     } finally {
       setAddingToCart(null)
     }
@@ -263,17 +257,14 @@ const Home: React.FC = () => {
           price: product.price,
           image_url: product.image_url || undefined
         })
-        success('Ajouté aux favoris !', `${product.name} a été ajouté à vos favoris`)
       }
     } catch (err) {
-      error('Erreur', 'Impossible d\'ajouter aux favoris')
     }
   }
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (newsletterEmail.trim()) {
-      success('Inscription réussie !', 'Vous recevrez bientôt nos dernières actualités')
       setNewsletterEmail('')
     }
   }
@@ -955,7 +946,6 @@ const Home: React.FC = () => {
       </section>
 
       {/* Toast Notifications */}
-      <ToastContainer toasts={toasts} onRemove={removeToast} />
 
       {/* Modal Vidéo */}
       {isVideoPlaying && (

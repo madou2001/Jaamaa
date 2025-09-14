@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Masquer l'admin des moteurs de recherche
+Disallow: /admin
+Disallow: /admin/
+Disallow: /admin/*
+Disallow: /admin/products
+Disallow: /admin/orders
+Disallow: /admin/customers
+Disallow: /admin/categories
+Disallow: /admin/analytics
+Disallow: /admin/settings
+
+# Sitemap
+Sitemap: https://jaayma.com/sitemap.xml

@@ -118,7 +118,6 @@ export const useAdvancedSearch = () => {
         })
 
     } catch (error) {
-      // console.error('Erreur lors de la génération de suggestions:', error)
     }
 
     return suggestions.slice(0, 8)
@@ -215,7 +214,6 @@ export const useAdvancedSearch = () => {
       }
 
     } catch (error) {
-      // console.error('Erreur lors de la recherche:', error)
       setResults({
         products: [],
         suggestions: [],

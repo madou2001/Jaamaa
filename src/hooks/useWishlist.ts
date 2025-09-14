@@ -24,7 +24,6 @@ export const useWishlist = () => {
         setWishlistItems(parsedWishlist)
       }
     } catch (error) {
-      // console.error('Erreur lors du chargement de la wishlist:', error)
     }
   }, [])
 
@@ -33,7 +32,6 @@ export const useWishlist = () => {
     try {
       localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(items))
     } catch (error) {
-      // console.error('Erreur lors de la sauvegarde de la wishlist:', error)
     }
   }
 
@@ -73,7 +71,6 @@ export const useWishlist = () => {
         return newItems
       })
     } catch (error) {
-      // console.error('Erreur lors de l\'ajout à la wishlist:', error)
       throw error
     } finally {
       setLoading(false)

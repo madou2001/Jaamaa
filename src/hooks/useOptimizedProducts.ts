@@ -51,6 +51,7 @@ export const useOptimizedProducts = (filters: ProductFilters = {}) => {
   const [total, setTotal] = useState(0)
   const [hasMore, setHasMore] = useState(false)
   const [page, setPage] = useState(filters.page || 1)
+  const [totalPages, setTotalPages] = useState(0)
 
   // Paramètres par défaut
   const limit = filters.limit || 12
@@ -173,6 +174,7 @@ export const useOptimizedProducts = (filters: ProductFilters = {}) => {
         setProducts(result.products)
         setTotal(result.total)
         setHasMore(result.hasMore)
+        setTotalPages(Math.ceil(result.total / limit))
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Erreur de chargement')
       } finally {
@@ -224,6 +226,7 @@ export const useOptimizedProducts = (filters: ProductFilters = {}) => {
       setProducts(result.products)
       setTotal(result.total)
       setHasMore(result.hasMore)
+      setTotalPages(Math.ceil(result.total / limit))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur de chargement')
     } finally {
@@ -246,6 +249,7 @@ export const useOptimizedProducts = (filters: ProductFilters = {}) => {
           setProducts(result.products)
           setTotal(result.total)
           setHasMore(result.hasMore)
+          setTotalPages(Math.ceil(result.total / limit))
         }
       } catch (err) {
         if (isMounted) {
@@ -319,6 +323,37 @@ export const useOptimizedProducts = (filters: ProductFilters = {}) => {
     }
   }, [hasMore, loading, currentFilters, page, limit, total])
 
+  // Fonction pour changer de page (pagination moderne)
+  const goToPage = useCallback(async (newPage: number) => {
+    if (newPage === page || loading || newPage < 1 || newPage > totalPages) return
+
+    try {
+      setLoading(true)
+      setPage(newPage)
+      
+      const newFilters = { ...currentFilters, page: newPage }
+      const cacheKey = generateCacheKey('products', newFilters)
+      const cached = productsCache.get<ProductsResponse>(cacheKey)
+      
+      let result: ProductsResponse
+      if (cached) {
+        result = cached
+      } else {
+        result = await fetchProducts()
+      }
+
+      // Remplacer les produits (pagination) au lieu d'accumuler
+      setProducts(result.products)
+      setTotal(result.total)
+      setHasMore(result.hasMore)
+      setTotalPages(Math.ceil(result.total / limit))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur de chargement')
+    } finally {
+      setLoading(false)
+    }
+  }, [page, loading, totalPages, currentFilters, fetchProducts, limit])
+
   return {
     products,
     loading,
@@ -326,7 +361,9 @@ export const useOptimizedProducts = (filters: ProductFilters = {}) => {
     total,
     hasMore,
     page,
+    totalPages,
     loadMore,
+    goToPage,
     refresh,
     search: debouncedSearch,
     preloadNextPage

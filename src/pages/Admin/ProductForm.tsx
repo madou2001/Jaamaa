@@ -91,7 +91,6 @@ const ProductForm: React.FC = () => {
         setImagePreview(product.image_url)
       }
     } catch (err) {
-      // console.error('Erreur lors du chargement du produit:', err)
       error('Erreur', 'Impossible de charger le produit')
       navigate('/admin/products')
     } finally {
@@ -180,7 +179,6 @@ const ProductForm: React.FC = () => {
 
       navigate('/admin/products')
     } catch (err) {
-      // console.error('Erreur lors de la sauvegarde:', err)
       error('Erreur', `Impossible de ${isEditing ? 'mettre à jour' : 'créer'} le produit`)
     } finally {
       setLoading(false)

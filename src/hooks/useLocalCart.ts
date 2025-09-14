@@ -161,7 +161,7 @@ export const useLocalCart = () => {
 
   const getCartTotal = () => {
     return cartItems.reduce((total, item) => {
-      return total + (item.productPrice * item.quantity)
+      return total + ((item.productPrice || 0) * item.quantity)
     }, 0)
   }
 

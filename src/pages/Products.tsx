@@ -29,7 +29,7 @@ import { useWishlist } from '../hooks/useWishlist'
 import { useToast } from '../hooks/useToast'
 import ToastContainer from '../components/UI/Toast'
 import OptimizedImage from '../components/UI/OptimizedImage'
-import { ProductsGridSkeleton, LoadMoreButton, EmptyState } from '../components/UI/LoadingStates'
+import { ProductsGridSkeleton, EmptyState } from '../components/UI/LoadingStates'
 import { setSEO } from '../utils/seo'
 import { optimizeImageUrl } from '../utils/performance'
 
@@ -39,6 +39,8 @@ interface ProductFilters {
   minPrice?: number
   maxPrice?: number
   featured?: boolean
+  page?: number
+  limit?: number
   sortBy?: 'name' | 'price' | 'created_at'
   sortOrder?: 'asc' | 'desc'
 }
@@ -63,7 +65,7 @@ const Products: React.FC = () => {
   const { addToCart: addToLocalCart, isInCart } = useLocalCart()
   const { addToWishlist, isInWishlist } = useWishlist()
 
-  // Récupérer les filtres depuis l'URL
+  // Récupérer les filtres depuis l'URL - TOUS LES PRODUITS
   const filters: ProductFilters = {
     category: searchParams.get('category') || undefined,
     search: searchParams.get('search') || undefined,
@@ -71,7 +73,8 @@ const Products: React.FC = () => {
     maxPrice: searchParams.get('maxPrice') ? parseInt(searchParams.get('maxPrice')!) : undefined,
     featured: searchParams.get('featured') === 'true' || undefined,
     sortBy: (searchParams.get('sortBy') as any) || 'name',
-    sortOrder: (searchParams.get('sortOrder') as any) || 'asc'
+    sortOrder: (searchParams.get('sortOrder') as any) || 'asc',
+    limit: 1000 // Charger tous les produits d'un coup
   }
 
   // Hooks optimisés
@@ -79,10 +82,7 @@ const Products: React.FC = () => {
     products, 
     loading: productsLoading, 
     error: productsError, 
-    total, 
-    hasMore, 
-    loadMore, 
-    preloadNextPage 
+    total
   } = useOptimizedProducts(filters)
   
   const { 
@@ -114,12 +114,6 @@ const Products: React.FC = () => {
     })
   }, [categories, filters.category])
 
-  // Préchargement intelligent
-  useEffect(() => {
-    if (products.length > 0 && hasMore) {
-      preloadNextPage()
-    }
-  }, [products, hasMore, preloadNextPage])
 
 
   const updateFilters = (newFilters: Partial<ProductFilters>) => {
@@ -504,7 +498,7 @@ const Products: React.FC = () => {
                 animate={isProductsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
                       transition={{ duration: 0.6, delay: index * 0.1 }}
                 className={`group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 ${
-                        viewMode === 'list' ? 'flex' : ''
+                        viewMode === 'list' ? 'flex' : 'h-full flex flex-col'
                       }`}
                 whileHover={{ y: -5, scale: 1.02 }}
                     >
@@ -604,7 +598,7 @@ const Products: React.FC = () => {
           </div>
 
                 {/* Contenu */}
-                <div className="p-6 flex-1">
+                <div className={`p-6 ${viewMode === 'list' ? 'flex-1' : 'flex flex-col flex-grow'}`}>
                   {/* Catégorie */}
                         {product.categories && (
                     <div className="text-sm text-indigo-600 font-medium mb-2">
@@ -613,9 +607,9 @@ const Products: React.FC = () => {
                         )}
 
                   {/* Nom */}
-                        <Link to={`/products/${product.slug}`}>
-                    <h3 className="font-bold text-lg mb-3 hover:text-indigo-600 transition-colors line-clamp-2">
-                            {product.name}
+                        <Link to={`/products/${product.slug}`} className="block mb-3">
+                    <h3 className="font-bold text-lg hover:text-indigo-600 transition-colors leading-tight min-h-[3.5rem] flex items-start">
+                            <span className="line-clamp-2">{product.name}</span>
                           </h3>
                         </Link>
 
@@ -634,61 +628,71 @@ const Products: React.FC = () => {
                           </p>
                         )}
 
-                  {/* Prix */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-2xl font-bold text-gray-900">
-                              {formatPrice(product.price)}
-                            </span>
-                            {product.compare_price && (
-                        <span className="text-sm text-gray-500 line-through">
-                                {formatPrice(product.compare_price)}
-                  </span>
-                )}
-                    </div>
-            </div>
+                  {/* Section prix et bouton - auto-positionnée en bas */}
+                  <div className={`${viewMode === 'grid' ? 'mt-auto space-y-4' : ''}`}>
+                    {/* Prix */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-2xl font-bold text-gray-900">
+                                {formatPrice(product.price)}
+                              </span>
+                              {product.compare_price && (
+                          <span className="text-sm text-gray-500 line-through">
+                                  {formatPrice(product.compare_price)}
+                    </span>
+                  )}
+                      </div>
+                      {product.compare_price && product.compare_price > product.price && (
+                        <span className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-lg">
+                          -{Math.round(((product.compare_price - product.price) / product.compare_price) * 100)}%
+                        </span>
+                      )}
+              </div>
 
-                  {/* Bouton d'action */}
-                          <motion.button 
-                            onClick={() => addToCart(product.id)}
-                            disabled={addingToCart === product.id}
-                    className={`w-full py-3 rounded-xl font-bold transition-all duration-300 disabled:opacity-50 flex items-center justify-center ${
-                              isInCart(product.id) 
-                        ? 'bg-green-500 hover:bg-green-600 text-white' 
-                        : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl'
-                    }`}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                          >
-                            {addingToCart === product.id ? (
-                              <>
-                                <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                                Ajout en cours...
-                              </>
-                            ) : isInCart(product.id) ? (
-                              <>
-                        <CheckIcon className="h-5 w-5 mr-2" />
-                        Dans le panier
-                              </>
-                            ) : (
-                              <>
-                                <ShoppingCartIcon className="h-5 w-5 mr-2" />
-                                Ajouter au panier
-                              </>
-                            )}
-                          </motion.button>
+                    {/* Bouton d'action */}
+                            <motion.button 
+                              onClick={() => addToCart(product.id)}
+                              disabled={addingToCart === product.id}
+                      className={`w-full py-3 rounded-xl font-bold transition-all duration-300 disabled:opacity-50 flex items-center justify-center ${
+                                isInCart(product.id) 
+                          ? 'bg-green-500 hover:bg-green-600 text-white' 
+                          : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl'
+                      }`}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                            >
+                              {addingToCart === product.id ? (
+                                <>
+                                  <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                                  Ajout en cours...
+                                </>
+                              ) : isInCart(product.id) ? (
+                                <>
+                          <CheckIcon className="h-5 w-5 mr-2" />
+                          Dans le panier
+                                </>
+                              ) : (
+                                <>
+                                  <ShoppingCartIcon className="h-5 w-5 mr-2" />
+                                  Ajouter au panier
+                                </>
+                              )}
+                            </motion.button>
+                  </div>
                       </div>
                     </motion.div>
                   ))}
 
-            {/* Bouton Charger Plus */}
-            <LoadMoreButton
-              loading={loading}
-              hasMore={hasMore}
-              onLoadMore={loadMore}
-              loadedCount={products.length}
-              totalCount={total}
-            />
+            {/* Affichage du total de produits */}
+            {products.length > 0 && (
+              <div className="text-center mt-8 mb-4">
+                <div className="inline-flex items-center bg-white rounded-full px-6 py-3 shadow-lg border border-gray-200">
+                  <span className="text-gray-600 text-sm">
+                    <span className="font-bold text-indigo-600">{products.length}</span> produit{products.length > 1 ? 's' : ''} affiché{products.length > 1 ? 's' : ''} sur <span className="font-bold text-indigo-600">{total}</span>
+                  </span>
+                </div>
+              </div>
+            )}
                 </motion.div>
               )}
       </section>

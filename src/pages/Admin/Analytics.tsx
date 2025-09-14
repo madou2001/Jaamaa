@@ -146,7 +146,6 @@ const Analytics: React.FC = () => {
       })
 
     } catch (error) {
-      // console.error('Erreur lors du chargement des analytics:', error)
     } finally {
       setLoading(false)
     }

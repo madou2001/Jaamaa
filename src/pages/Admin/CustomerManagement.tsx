@@ -87,7 +87,6 @@ const CustomerManagement: React.FC = () => {
 
       setCustomers(enrichedCustomers)
     } catch (err) {
-      // console.error('Erreur lors du chargement des clients:', err)
       error('Erreur', 'Impossible de charger les clients')
     } finally {
       setLoading(false)

@@ -1,11 +1,8 @@
 import { useCallback } from 'react'
-import { useToast } from './useToast'
 
 export const useErrorHandler = () => {
-  const { error: showError } = useToast()
 
   const handleError = useCallback((error: any, customMessage?: string) => {
-    // console.error('Error:', error)
     
     let message = customMessage || 'Une erreur est survenue'
     
@@ -22,7 +19,6 @@ export const useErrorHandler = () => {
       }
     }
     
-    showError('Erreur', message)
   }, [showError])
 
   return { handleError }

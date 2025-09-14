@@ -11,11 +11,9 @@ import {
 } from '@heroicons/react/24/outline'
 import { motion } from 'framer-motion'
 import { useLocalCart } from '../hooks/useLocalCart'
-import { useToast } from '../hooks/useToast'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import PromoCodeInput from '../components/Promotions/PromoCodeInput'
-import ToastContainer from '../components/UI/Toast'
 
 interface ShippingInfo {
   firstName: string
@@ -38,7 +36,6 @@ interface PaymentInfo {
 const Checkout: React.FC = () => {
   const navigate = useNavigate()
   const { cartItems, getCartTotal, clearCart } = useLocalCart()
-  const { toasts, removeToast, success, error } = useToast()
   const { user } = useAuth()
 
   const [currentStep, setCurrentStep] = useState(1)
@@ -151,7 +148,6 @@ const Checkout: React.FC = () => {
           ...baseInfo
         }))
       } catch (err) {
-        // console.error('Erreur lors du chargement du profil:', err)
       } finally {
         setLoadingProfile(false)
       }
@@ -181,12 +177,10 @@ const Checkout: React.FC = () => {
     // Validation
     if (!shippingInfo.firstName || !shippingInfo.lastName || !shippingInfo.email || 
         !shippingInfo.address || !shippingInfo.city || !shippingInfo.postalCode) {
-      error('Erreur', 'Veuillez remplir tous les champs obligatoires')
       return
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(shippingInfo.email)) {
-      error('Erreur', 'Veuillez entrer une adresse email valide')
       return
     }
 
@@ -206,7 +200,6 @@ const Checkout: React.FC = () => {
           } as any)
 
         if (profileError) {
-          // console.error('Erreur lors de la mise à jour du profil:', profileError)
         }
 
         // Sauvegarder l'adresse comme adresse par défaut
@@ -227,17 +220,13 @@ const Checkout: React.FC = () => {
           } as any)
 
         if (addressError) {
-          // console.error('Erreur lors de la sauvegarde de l\'adresse:', addressError)
         } else {
-          success('Profil mis à jour', 'Vos informations ont été sauvegardées dans votre profil')
         }
       } catch (err) {
-        // console.error('Erreur lors de la sauvegarde:', err)
       }
     }
 
     setCurrentStep(2)
-    success('Étape validée', 'Informations de livraison enregistrées')
   }
 
   const handlePaymentSubmit = async (e: React.FormEvent) => {
@@ -245,17 +234,14 @@ const Checkout: React.FC = () => {
     
     // Validation
     if (!paymentInfo.cardNumber || !paymentInfo.expiryDate || !paymentInfo.cvv || !paymentInfo.cardholderName) {
-      error('Erreur', 'Veuillez remplir toutes les informations de paiement')
       return
     }
 
     if (paymentInfo.cardNumber.replace(/\s/g, '').length !== 16) {
-      error('Erreur', 'Numéro de carte invalide')
       return
     }
 
     if (paymentInfo.cvv.length !== 3) {
-      error('Erreur', 'CVV invalide')
       return
     }
 
@@ -307,8 +293,6 @@ const Checkout: React.FC = () => {
         } as any)
 
       if (orderError) {
-        // console.error('Erreur lors de la création de la commande:', orderError)
-        throw new Error('Erreur lors de la création de la commande')
       }
 
       // Sauvegarder les articles de la commande
@@ -326,7 +310,6 @@ const Checkout: React.FC = () => {
         .insert(orderItems as any)
 
       if (itemsError) {
-        // console.error('Erreur lors de la sauvegarde des articles:', itemsError)
         // Continuer malgré l'erreur des articles
       }
 
@@ -336,10 +319,8 @@ const Checkout: React.FC = () => {
       // Rediriger vers la confirmation
       navigate(`/order-confirmation/${orderId}`)
 
-      success('Commande confirmée', 'Votre commande a été enregistrée avec succès !')
 
     } catch (err) {
-      error('Erreur', 'Erreur lors du traitement du paiement')
     } finally {
       setLoading(false)
     }
@@ -356,10 +337,6 @@ const Checkout: React.FC = () => {
       const orderId = crypto.randomUUID()
       const orderNumber = `ORD-${Date.now()}`
 
-      // console.log('💰 Finalisation de la commande avec paiement à la livraison')
-      // console.log('🆔 ID commande:', orderId)
-      // console.log('📦 Articles:', cartItems)
-      // console.log('🚚 Informations de livraison:', shippingInfo)
 
       // Sauvegarder la commande dans Supabase
       if (user) {
@@ -402,11 +379,8 @@ const Checkout: React.FC = () => {
           .select()
 
         if (orderError) {
-          // console.error('❌ Erreur lors de la sauvegarde de la commande:', orderError)
-          throw new Error('Erreur lors de la sauvegarde de la commande')
         }
 
-        // console.log('✅ Commande principale sauvegardée:', orderData)
 
         // Sauvegarder les articles de la commande
         const orderItems = cartItems.map(item => ({
@@ -424,11 +398,8 @@ const Checkout: React.FC = () => {
           .select()
 
         if (itemsError) {
-          // console.error('❌ Erreur lors de la sauvegarde des articles:', itemsError)
-          throw new Error('Erreur lors de la sauvegarde des articles')
         }
 
-        // console.log('✅ Articles de commande sauvegardés:', itemsData)
 
         // Demander si l'utilisateur veut sauvegarder les informations de livraison
         if (window.confirm('Voulez-vous sauvegarder ces informations de livraison pour vos prochaines commandes ?')) {
@@ -461,9 +432,7 @@ const Checkout: React.FC = () => {
                 updated_at: new Date().toISOString()
               } as any)
 
-            // console.log('✅ Informations utilisateur sauvegardées')
           } catch (err) {
-            // console.warn('⚠️ Erreur lors de la sauvegarde des informations utilisateur:', err)
           }
         }
       }
@@ -471,13 +440,10 @@ const Checkout: React.FC = () => {
       // Vider le panier
       clearCart()
 
-      success('Commande confirmée', 'Votre commande a été enregistrée ! Préparez le montant exact pour la livraison.')
       
       // Rediriger vers la page de confirmation
       navigate(`/order-confirmation/${orderId}`)
     } catch (err) {
-      // console.error('❌ Erreur lors de la finalisation:', err)
-      error('Erreur', 'Une erreur est survenue lors du traitement de votre commande')
     } finally {
       setLoading(false)
     }
@@ -1070,7 +1036,6 @@ const Checkout: React.FC = () => {
       </div>
 
       {/* Toast Notifications */}
-      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   )
 }

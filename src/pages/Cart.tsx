@@ -58,7 +58,7 @@ const Cart: React.FC = () => {
       await addToWishlist({
         id: cartItem.productId,
         name: cartItem.productName,
-        price: cartItem.productPrice,
+        price: cartItem.productPrice || 0,
         image_url: cartItem.productImage
       })
       removeFromCart(cartItem.id)
@@ -150,7 +150,7 @@ const Cart: React.FC = () => {
                     {/* Product Info */}
                     <div className="flex-1 min-w-0">
                       <h3 className="text-lg font-medium text-gray-900">{item.productName}</h3>
-                      <p className="text-primary-600 font-semibold">{item.productPrice.toFixed(2)} €</p>
+                      <p className="text-primary-600 font-semibold">{(item.productPrice || 0).toFixed(2)} €</p>
                     </div>
 
                     {/* Quantity Controls */}
@@ -174,7 +174,7 @@ const Cart: React.FC = () => {
 
                     {/* Total Price */}
                     <div className="text-lg font-semibold text-gray-900">
-                      {(item.productPrice * item.quantity).toFixed(2)} €
+                      {((item.productPrice || 0) * item.quantity).toFixed(2)} €
                     </div>
 
                     {/* Actions */}

@@ -168,11 +168,9 @@ const ModernProductCard: React.FC<ModernProductCardProps> = ({
             fallbackSrc="/placeholder-product.svg"
             onLoad={() => {
               setImageLoaded(true)
-              // // console.log('✅ ModernProductCard image loaded:', product.image_url)
             }}
             onError={() => {
               setImageLoaded(true)
-              // // console.warn('❌ ModernProductCard image error:', product.image_url)
             }}
           />
 

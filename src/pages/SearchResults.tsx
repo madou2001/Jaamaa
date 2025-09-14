@@ -11,16 +11,13 @@ import { motion } from 'framer-motion'
 import { useAdvancedSearch } from '../hooks/useAdvancedSearch'
 import { useLocalCart } from '../hooks/useLocalCart'
 import { useWishlist } from '../hooks/useWishlist'
-import { useToast } from '../hooks/useToast'
 import AdvancedSearchBar from '../components/Search/AdvancedSearchBar'
-import ToastContainer from '../components/UI/Toast'
 
 const SearchResults: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const { results, loading, search } = useAdvancedSearch()
   const { addToCart, isInCart } = useLocalCart()
   const { toggleWishlist, isInWishlist } = useWishlist()
-  const { toasts, removeToast, success, error } = useToast()
 
   const [showFilters, setShowFilters] = useState(false)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
@@ -108,9 +105,7 @@ const SearchResults: React.FC = () => {
         price: product.price,
         image_url: product.image_url
       })
-      success('Produit ajouté !', `${product.name} ajouté au panier`)
     } catch (err) {
-      error('Erreur', 'Impossible d\'ajouter le produit au panier')
     }
   }
 
@@ -124,12 +119,9 @@ const SearchResults: React.FC = () => {
       })
       
       if (added) {
-        success('Ajouté aux favoris !', `${product.name} ajouté à vos favoris`)
       } else {
-        success('Retiré des favoris', `${product.name} retiré de vos favoris`)
       }
     } catch (err) {
-      error('Erreur', 'Impossible de modifier la liste de souhaits')
     }
   }
 
@@ -505,7 +497,6 @@ const SearchResults: React.FC = () => {
       </div>
 
       {/* Toast Notifications */}
-      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   )
 }
