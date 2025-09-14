@@ -1,6 +1,6 @@
 import React from 'react'
 import { useRole } from '../../hooks/useRole'
-import { ShieldCheckIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { ShieldCheckIcon } from '@heroicons/react/24/outline'
 
 const SecurityInfo: React.FC = () => {
   const { userProfile, isAdmin } = useRole()

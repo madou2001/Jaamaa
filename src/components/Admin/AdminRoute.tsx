@@ -2,7 +2,7 @@ import React from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useRole } from '../../hooks/useRole'
-import { motion } from 'framer-motion'
+// import { motion } from 'framer-motion'
 import SilentRedirect from './SilentRedirect'
 
 interface AdminRouteProps {
