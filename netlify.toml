@@ -11,10 +11,4 @@
   to = "/index.html"
   status = 200
 
-[context.production.environment]
-  VITE_SUPABASE_URL = "your-supabase-url"
-  VITE_SUPABASE_ANON_KEY = "your-supabase-anon-key"
-
-[context.deploy-preview.environment]
-  VITE_SUPABASE_URL = "your-supabase-url"
-  VITE_SUPABASE_ANON_KEY = "your-supabase-anon-key"
+# Variables d'environnement configurées via l'interface Vercel/Netlify
