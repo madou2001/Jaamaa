@@ -4,9 +4,26 @@ import type { Database } from './supabase-types'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
+// Validation plus robuste des variables d'environnement
+if (!supabaseUrl) {
+  console.error('❌ VITE_SUPABASE_URL is missing or invalid')
+  throw new Error('VITE_SUPABASE_URL environment variable is required')
 }
+
+if (!supabaseAnonKey) {
+  console.error('❌ VITE_SUPABASE_ANON_KEY is missing or invalid')
+  throw new Error('VITE_SUPABASE_ANON_KEY environment variable is required')
+}
+
+// Validation de l'URL Supabase
+try {
+  new URL(supabaseUrl)
+} catch (error) {
+  console.error('❌ Invalid Supabase URL format:', supabaseUrl)
+  throw new Error(`Invalid Supabase URL: ${supabaseUrl}. Must be a valid HTTP or HTTPS URL.`)
+}
+
+console.log('✅ Supabase configuration loaded successfully')
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
 
